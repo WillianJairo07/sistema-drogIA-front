@@ -1,0 +1,92 @@
+import { NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Tags,
+  Package,
+  LogOut,
+} from "lucide-react";
+import logoImage from "../../assets/logo.png";
+
+const menuItems = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Categorías",
+    path: "/dashboard/categorias",
+    icon: Tags,
+  },
+  {
+    label: "Productos",
+    path: "/dashboard/productos",
+    icon: Package,
+  },
+];
+
+export default function Sidebar({ isOpen, onClose }) {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
+  return (
+    <aside
+      className={`absolute inset-y-0 left-0 z-50 overflow-hidden bg-[#56ccf2] transition-all duration-300 lg:relative ${
+        isOpen ? "w-64 shadow-xl lg:shadow-none" : "w-0 -translate-x-full lg:translate-x-0"
+      }`}
+    >
+      <div className="flex h-full w-64 flex-col">
+        {/* Logo */}
+        <div className="flex h-20 shrink-0 items-center justify-center border-b border-sky-300/60 bg-[#7FCFEC]">
+          <img
+            src={logoImage}
+            alt="DrogIA Logo"
+            className="w-[210px] max-h-16 scale-200 object-contain"
+          />
+        </div>
+
+        {/* Menú */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="flex flex-col gap-1.5">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === "/dashboard"}
+                  onClick={() => window.innerWidth < 1024 && onClose()}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3.5 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+                      isActive
+                        ? "bg-[#17324c] text-white shadow-md"
+                        : "text-slate-800 hover:bg-[#17324c] hover:text-white"
+                    }`
+                  }
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Cerrar sesión */}
+        <div className="shrink-0 border-t border-sky-400/60 p-3">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3.5 rounded-lg px-4 py-3 text-sm font-medium text-red-700 transition-colors hover:bg-red-500/10"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+}
