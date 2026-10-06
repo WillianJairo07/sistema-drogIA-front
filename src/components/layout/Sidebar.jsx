@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  Tags,
+  FileText,
+  Users,
   Package,
   LogOut,
 } from "lucide-react";
@@ -14,9 +15,14 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    label: "Categorías",
-    path: "/dashboard/categorias",
-    icon: Tags,
+    label: "Cotizaciones",
+    path: "/dashboard/cotizaciones",
+    icon: FileText,
+  },
+  {
+    label: "Clientes",
+    path: "/dashboard/clientes",
+    icon: Users,
   },
   {
     label: "Productos",
@@ -34,10 +40,13 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <aside
       className={`absolute inset-y-0 left-0 z-50 overflow-hidden bg-[#56ccf2] transition-all duration-300 lg:relative ${
-        isOpen ? "w-64 shadow-xl lg:shadow-none" : "w-0 -translate-x-full lg:translate-x-0"
+        isOpen
+          ? "w-64 shadow-xl lg:shadow-none"
+          : "w-0 -translate-x-full lg:translate-x-0"
       }`}
     >
       <div className="flex h-full w-64 flex-col">
+
         {/* Logo */}
         <div className="flex h-20 shrink-0 items-center justify-center border-b border-sky-300/60 bg-[#7FCFEC]">
           <img
@@ -58,7 +67,11 @@ export default function Sidebar({ isOpen, onClose }) {
                   key={item.path}
                   to={item.path}
                   end={item.path === "/dashboard"}
-                  onClick={() => window.innerWidth < 1024 && onClose()}
+                  onClick={() => {
+                    if (window.innerWidth < 1024) {
+                      onClose();
+                    }
+                  }}
                   className={({ isActive }) =>
                     `flex items-center gap-3.5 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                       isActive
@@ -86,6 +99,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <span>Cerrar Sesión</span>
           </button>
         </div>
+
       </div>
     </aside>
   );

@@ -10,7 +10,8 @@ import {
 
 const pageTitles = {
   "/dashboard": "Panel Principal",
-  "/dashboard/categorias": "Gestión de Categorías",
+  "/dashboard/cotizaciones": "Gestión de Cotizaciones",
+  "/dashboard/clientes": "Gestión de Clientes",
   "/dashboard/productos": "Gestión de Productos",
 };
 
@@ -109,8 +110,8 @@ export default function Topbar({ onToggleSidebar }) {
           </button>
 
           {showUser && (
-            <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg border bg-white py-1 shadow-xl">
-              <p className="border-b px-4 py-2 text-xs text-slate-500">
+            <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg bg-white py-1 shadow-xl">
+              <p className="px-4 py-2 text-xs text-slate-500">
                 admin@drogia.com
               </p>
 

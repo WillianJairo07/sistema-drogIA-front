@@ -3,8 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import DashboardLayout from "../layouts/DashboardLayout";
 import DashboardPage from "../pages/DashboardPage";
-import { CategoriasPage } from "../pages/CategoriasPage";
 import { ProductosPage } from "../pages/ProductosPage";
+import { CotizacionesPage } from "../pages/CotizacionesPage";
+import { ClientesPage } from "../pages/ClientesPage";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
@@ -26,7 +27,8 @@ export default function AppRouter() {
           }
         >
           <Route index element={<DashboardPage />} />
-          <Route path="categorias" element={<CategoriasPage />} />
+          <Route path="cotizaciones" element={<CotizacionesPage />} />
+          <Route path="clientes" element={<ClientesPage />} />
           <Route path="productos" element={<ProductosPage />} />
         </Route>
 
