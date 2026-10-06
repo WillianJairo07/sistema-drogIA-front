@@ -7,6 +7,7 @@ import { ProductosPage } from "../pages/ProductosPage";
 import { CotizacionesPage } from "../pages/CotizacionesPage";
 import { ClientesPage } from "../pages/ClientesPage";
 
+
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 export default function AppRouter() {

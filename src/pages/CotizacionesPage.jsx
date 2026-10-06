@@ -1,8 +1,15 @@
 import { useState } from "react";
+
 import { CotizacionForm } from "../features/cotizaciones/components/CotizacionForm";
 
 export function CotizacionesPage() {
   const [showForm, setShowForm] = useState(false);
+  const [quotes, setQuotes] = useState([]);
+
+  const handleCreateQuote = (quote) => {
+    setQuotes((currentQuotes) => [...currentQuotes, quote]);
+    setShowForm(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -17,7 +24,7 @@ export function CotizacionesPage() {
         </p>
       </div>
 
-      {/* Botón Nueva Cotización */}
+      {/* Nueva cotización */}
       {!showForm && (
         <div className="flex justify-end">
           <button
@@ -32,15 +39,43 @@ export function CotizacionesPage() {
 
       {/* Formulario */}
       {showForm && (
-        <CotizacionForm onCancel={() => setShowForm(false)} />
+        <CotizacionForm
+          onCancel={() => setShowForm(false)}
+          onGenerate={handleCreateQuote}
+        />
       )}
 
-      {/* Lista de cotizaciones */}
+      {/* Lista */}
       {!showForm && (
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm text-slate-500">
-            No hay cotizaciones registradas.
-          </p>
+          {quotes.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              No hay cotizaciones registradas.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {quotes.map((quote) => (
+                <div
+                  key={quote.id}
+                  className="flex items-center justify-between rounded-lg border border-slate-200 p-4"
+                >
+                  <div>
+                    <p className="font-medium text-[#17324c]">
+                      {quote.number}
+                    </p>
+
+                    <p className="text-sm text-slate-500">
+                      {quote.client.name} · {quote.date}
+                    </p>
+                  </div>
+
+                  <p className="font-semibold text-[#17324c]">
+                    S/ {quote.total.toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
