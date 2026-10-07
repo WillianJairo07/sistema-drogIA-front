@@ -7,6 +7,8 @@ import Topbar from "../components/layout/Topbar";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sales, setSales] = useState([]);
+  const [missingItems, setMissingItems] = useState([]);
 
   const toggleSidebar = () => {
     setSidebarOpen((current) => !current);
@@ -14,6 +16,48 @@ export default function DashboardLayout() {
 
   const closeSidebar = () => {
     setSidebarOpen(false);
+  };
+
+  const handleCreateSale = (sale) => {
+    setSales((currentSales) => [
+      ...currentSales,
+      sale,
+    ]);
+
+    const newMissingItems = sale.items
+      .filter((item) => item.quantity > item.product.stock)
+      .map((item) => ({
+        id: `${sale.id}-${item.product.id}`,
+        product: item.product.name,
+        requested: item.quantity,
+        stock: item.product.stock,
+        status: "Pendiente",
+      }));
+
+    setMissingItems((currentItems) => [
+      ...currentItems,
+      ...newMissingItems,
+    ]);
+  };
+
+  const handleStatusChange = (saleId, status) => {
+    setSales((currentSales) =>
+      currentSales.map((sale) =>
+        sale.id === saleId
+          ? { ...sale, status }
+          : sale
+      )
+    );
+  };
+
+  const handleMissingItemStatusChange = (itemId, status) => {
+    setMissingItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId
+          ? { ...item, status }
+          : item
+      )
+    );
   };
 
   return (
@@ -43,7 +87,15 @@ export default function DashboardLayout() {
 
         <main className="flex-1 overflow-y-auto bg-[#fcf6f4] p-6 lg:p-8">
           <div className="mx-auto max-w-7xl">
-            <Outlet />
+            <Outlet
+              context={{
+                sales,
+                onCreateSale: handleCreateSale,
+                onStatusChange: handleStatusChange,
+                missingItems,
+                onMissingItemStatusChange: handleMissingItemStatusChange,
+              }}
+            />
           </div>
         </main>
       </div>

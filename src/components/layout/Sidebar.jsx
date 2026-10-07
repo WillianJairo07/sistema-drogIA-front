@@ -3,7 +3,15 @@ import {
   LayoutDashboard,
   FileText,
   Users,
+  UserCog,
   Package,
+  ShoppingCart,
+  ArrowLeftRight,
+  Warehouse,
+  Mail,
+  Truck,
+  ClipboardList,
+  Clock3,
   LogOut,
 } from "lucide-react";
 import logoImage from "../../assets/logo.png";
@@ -25,9 +33,49 @@ const menuItems = [
     icon: Users,
   },
   {
+  label: "Usuarios",
+  path: "/dashboard/usuarios",
+  icon: UserCog,
+  },
+  {
     label: "Productos",
     path: "/dashboard/productos",
     icon: Package,
+  },
+  {
+  label: "Ventas",
+  path: "/dashboard/ventas",
+  icon: ShoppingCart,
+  },
+  {
+  label: "Ventas-Compras",
+  path: "/dashboard/ventas-compras",
+  icon: ArrowLeftRight,
+  },
+  {
+  label: "Inventario",
+  path: "/dashboard/inventario",
+  icon: Warehouse,
+  },
+  {
+  label: "Análisis de Correos",
+  path: "/dashboard/correos",
+  icon: Mail,
+  },
+  {
+  label: "Proveedores",
+  path: "/dashboard/proveedores",
+  icon: Truck,
+  },
+  {
+  label: "Órdenes de Compra",
+  path: "/dashboard/ordenes-compra",
+  icon: ClipboardList,
+  },
+  {
+  label: "Plazos y Penalidades",
+  path: "/dashboard/plazos",
+  icon: Clock3,
   },
 ];
 

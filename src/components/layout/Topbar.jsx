@@ -13,6 +13,13 @@ const pageTitles = {
   "/dashboard/cotizaciones": "Gestión de Cotizaciones",
   "/dashboard/clientes": "Gestión de Clientes",
   "/dashboard/productos": "Gestión de Productos",
+  "/dashboard/ventas": "Gestión de Ventas",
+  "/dashboard/ventas-compras": "Panel Ventas-Compras",
+  "/dashboard/inventario": "Gestión de Inventario",
+  "/dashboard/correos": "Análisis de Correos",
+  "/dashboard/proveedores": "Gestión de Proveedores",
+  "/dashboard/ordenes-compra": "Gestión de Órdenes de Compra",
+  "/dashboard/plazos": "Plazos y Penalidades",
 };
 
 export default function Topbar({ onToggleSidebar }) {
