@@ -1,12 +1,10 @@
+
 import { useOutletContext } from "react-router-dom";
 
-import { MissingItemsPanel } from "../features/ventasCompras/components/MissingItemsPanel";
+import { PurchaseRequestsPanel } from "../features/ventasCompras/components/PurchaseRequestsPanel";
 
 export function VentasComprasPage() {
-  const {
-    missingItems,
-    onMissingItemStatusChange,
-  } = useOutletContext();
+  const { purchaseRequests } = useOutletContext();
 
   return (
     <div className="space-y-6">
@@ -16,13 +14,12 @@ export function VentasComprasPage() {
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          Consulta y gestiona los productos que presentan faltantes de stock.
+          Consulta las solicitudes de compra generadas desde las ventas.
         </p>
       </div>
 
-      <MissingItemsPanel
-        items={missingItems}
-        onStatusChange={onMissingItemStatusChange}
+      <PurchaseRequestsPanel
+        items={purchaseRequests}
       />
     </div>
   );

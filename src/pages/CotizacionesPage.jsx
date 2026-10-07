@@ -45,7 +45,7 @@ export function CotizacionesPage() {
         price: product.price,
       })),
       total: quote.total,
-      status: "Pendiente de despacho",
+      status: "Pendiente de compra",
     };
 
     onCreateSale(sale);
@@ -166,7 +166,9 @@ export function CotizacionesPage() {
                         {quote.status === "Pendiente" ? (
                           <button
                             type="button"
-                            onClick={() => handleAcceptQuote(quote.id)}
+                            onClick={() =>
+                              handleAcceptQuote(quote.id)
+                            }
                             className="rounded-lg border border-emerald-300 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
                           >
                             Aceptar
@@ -174,7 +176,9 @@ export function CotizacionesPage() {
                         ) : quote.status === "Aceptada" ? (
                           <button
                             type="button"
-                            onClick={() => handleConvertToSale(quote)}
+                            onClick={() =>
+                              handleConvertToSale(quote)
+                            }
                             className="rounded-lg bg-[#17324c] px-3 py-2 text-xs font-medium text-white hover:bg-[#234968]"
                           >
                             Convertir en venta

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function PurchaseOrderForm({
   suppliers,
   products,
+  request,
   onSave,
   onCancel,
 }) {
@@ -11,6 +12,31 @@ export function PurchaseOrderForm({
   const [quantity, setQuantity] = useState("");
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!request) {
+      setItems([]);
+      return;
+    }
+
+    const product = products.find(
+      (item) => item.id === request.productId
+    );
+
+    if (!product) {
+      return;
+    }
+
+    setItems([
+      {
+        productId: product.id,
+        product: product.name,
+        quantity: request.quantity,
+        price: product.price,
+        subtotal: request.quantity * product.price,
+      },
+    ]);
+  }, [request, products]);
 
   const handleAddProduct = () => {
     if (!selectedProductId) {
@@ -66,7 +92,9 @@ export function PurchaseOrderForm({
 
   const handleRemoveProduct = (productId) => {
     setItems((currentItems) =>
-      currentItems.filter((item) => item.productId !== productId)
+      currentItems.filter(
+        (item) => item.productId !== productId
+      )
     );
   };
 
@@ -100,6 +128,7 @@ export function PurchaseOrderForm({
       items,
       total,
       status: "Pendiente",
+      requestIds: request ? [request.id] : [],
     });
   };
 
@@ -117,6 +146,19 @@ export function PurchaseOrderForm({
           Registra los productos que se solicitarán al proveedor.
         </p>
       </div>
+
+      {request && (
+        <div className="mt-6 rounded-lg bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-700">
+            Solicitud de venta
+          </p>
+
+          <p className="mt-1 text-sm text-slate-500">
+            {request.saleNumber} · {request.product} ·{" "}
+            {request.quantity} unidades
+          </p>
+        </div>
+      )}
 
       <div className="mt-6">
         <label className="mb-2 block text-sm font-medium text-slate-700">

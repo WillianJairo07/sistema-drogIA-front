@@ -1,91 +1,72 @@
-const initialInventory = [
-  {
-    id: 1,
-    product: "Paracetamol 500 mg",
-    lot: "LOT-PAR-001",
-    stock: 120,
-    minimumStock: 50,
-    expiration: "2027-08-15",
-  },
-  {
-    id: 2,
-    product: "Alcohol 70%",
-    lot: "LOT-ALC-002",
-    stock: 20,
-    minimumStock: 30,
-    expiration: "2027-05-20",
-  },
-  {
-    id: 3,
-    product: "Ibuprofeno 400 mg",
-    lot: "LOT-IBU-003",
-    stock: 45,
-    minimumStock: 20,
-    expiration: "2026-12-10",
-  },
-];
-
-export function InventoryList() {
+export function InventoryList({ inventory = [] }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-[#17324c]">
-          Inventario actual
-        </h3>
-
-        <p className="mt-1 text-sm text-slate-500">
-          Consulta el stock, lotes y fechas de vencimiento de los productos.
-        </p>
-      </div>
-
+    <div className="overflow-hidden rounded-xl bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[850px] text-sm">
+        <table className="min-w-full">
           <thead className="bg-slate-50">
-            <tr className="text-left text-slate-600">
-              <th className="px-6 py-3 font-medium">Producto</th>
-              <th className="px-6 py-3 font-medium">Lote</th>
-              <th className="px-6 py-3 font-medium">Stock</th>
-              <th className="px-6 py-3 font-medium">Stock mínimo</th>
-              <th className="px-6 py-3 font-medium">Vencimiento</th>
-              <th className="px-6 py-3 font-medium">Estado</th>
+            <tr>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Producto
+              </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Lote
+              </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Stock
+              </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Stock mínimo
+              </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Vencimiento
+              </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                Estado
+              </th>
             </tr>
           </thead>
 
-          <tbody>
-            {initialInventory.map((item) => {
-              const lowStock = item.stock < item.minimumStock;
+          <tbody className="divide-y divide-slate-100">
+            {inventory.map((item) => {
+              const lowStock =
+                item.stock <= item.minimumStock;
 
               return (
-                <tr key={item.id} className="border-t border-slate-200">
-                  <td className="px-6 py-4 font-medium text-slate-700">
+                <tr
+                  key={item.id}
+                  className="hover:bg-slate-50"
+                >
+                  <td className="px-5 py-4 text-sm font-medium text-slate-800">
                     {item.product}
                   </td>
 
-                  <td className="px-6 py-4 text-slate-500">
+                  <td className="px-5 py-4 text-sm text-slate-600">
                     {item.lot}
                   </td>
 
-                  <td className="px-6 py-4 font-medium text-slate-700">
+                  <td className="px-5 py-4 text-sm text-slate-600">
                     {item.stock}
                   </td>
 
-                  <td className="px-6 py-4 text-slate-500">
+                  <td className="px-5 py-4 text-sm text-slate-600">
                     {item.minimumStock}
                   </td>
 
-                  <td className="whitespace-nowrap px-6 py-4 text-slate-500">
+                  <td className="px-5 py-4 text-sm text-slate-600">
                     {item.expiration}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-5 py-4">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                         lowStock
                           ? "bg-red-100 text-red-700"
-                          : "bg-emerald-100 text-emerald-700"
+                          : "bg-green-100 text-green-700"
                       }`}
                     >
-                      {lowStock ? "Stock bajo" : "Disponible"}
+                      {lowStock
+                        ? "Stock bajo"
+                        : "Disponible"}
                     </span>
                   </td>
                 </tr>

@@ -1,6 +1,7 @@
 export function PurchaseOrderList({
   orders,
   onStatusChange,
+  onRegisterReceipt,
 }) {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -15,7 +16,7 @@ export function PurchaseOrderList({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px] text-sm">
+        <table className="w-full min-w-[1050px] text-sm">
           <thead className="bg-slate-50">
             <tr className="text-left text-slate-600">
               <th className="px-6 py-3 font-medium">
@@ -40,6 +41,10 @@ export function PurchaseOrderList({
 
               <th className="px-6 py-3 font-medium">
                 Estado
+              </th>
+
+              <th className="px-6 py-3 text-right font-medium">
+                Acción
               </th>
             </tr>
           </thead>
@@ -93,23 +98,49 @@ export function PurchaseOrderList({
                       <option value="Pendiente">
                         Pendiente
                       </option>
+
                       <option value="Enviada">
                         Enviada
                       </option>
+
                       <option value="Recibida">
                         Recibida
                       </option>
+
                       <option value="Cancelada">
                         Cancelada
                       </option>
                     </select>
+                  </td>
+
+                  <td className="px-6 py-4 text-right">
+                    {order.status === "Recibida" &&
+                    !order.receiptRegistered ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onRegisterReceipt(order.id)
+                        }
+                        className="rounded-lg bg-[#17324c] px-3 py-2 text-xs font-medium text-white hover:bg-[#234968]"
+                      >
+                        Registrar recepción
+                      </button>
+                    ) : order.receiptRegistered ? (
+                      <span className="text-xs font-medium text-emerald-600">
+                        Recepción registrada
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">
+                        —
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="7"
                   className="px-6 py-8 text-center text-slate-500"
                 >
                   No hay órdenes de compra registradas.

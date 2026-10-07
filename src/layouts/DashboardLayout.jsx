@@ -5,10 +5,40 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 
+const initialInventory = [
+  {
+    id: 1,
+    product: "Paracetamol 500 mg",
+    lot: "LOT-PAR-001",
+    stock: 120,
+    minimumStock: 30,
+    expiration: "2027-08-15",
+  },
+  {
+    id: 2,
+    product: "Alcohol 70%",
+    lot: "LOT-ALC-002",
+    stock: 80,
+    minimumStock: 20,
+    expiration: "2027-05-20",
+  },
+  {
+    id: 3,
+    product: "Ibuprofeno 400 mg",
+    lot: "LOT-IBU-003",
+    stock: 45,
+    minimumStock: 15,
+    expiration: "2026-12-10",
+  },
+];
+
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const [sales, setSales] = useState([]);
-  const [missingItems, setMissingItems] = useState([]);
+  const [purchaseRequests, setPurchaseRequests] = useState([]);
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [inventory, setInventory] = useState(initialInventory);
 
   const toggleSidebar = () => {
     setSidebarOpen((current) => !current);
@@ -21,26 +51,29 @@ export default function DashboardLayout() {
   const handleCreateSale = (sale) => {
     setSales((currentSales) => [
       ...currentSales,
-      sale,
+      {
+        ...sale,
+        status: "En proceso",
+      },
     ]);
 
-    const newMissingItems = sale.items
-      .filter((item) => item.quantity > item.product.stock)
-      .map((item) => ({
-        id: `${sale.id}-${item.product.id}`,
-        product: item.product.name,
-        requested: item.quantity,
-        stock: item.product.stock,
-        status: "Pendiente",
-      }));
+    const requests = sale.items.map((item) => ({
+      id: `${sale.id}-${item.product.id}`,
+      saleId: sale.id,
+      saleNumber: sale.number,
+      productId: item.product.id,
+      product: item.product.name,
+      quantity: item.quantity,
+      status: "Pendiente de compra",
+    }));
 
-    setMissingItems((currentItems) => [
-      ...currentItems,
-      ...newMissingItems,
+    setPurchaseRequests((currentRequests) => [
+      ...currentRequests,
+      ...requests,
     ]);
   };
 
-  const handleStatusChange = (saleId, status) => {
+  const handleSaleStatusChange = (saleId, status) => {
     setSales((currentSales) =>
       currentSales.map((sale) =>
         sale.id === saleId
@@ -50,14 +83,115 @@ export default function DashboardLayout() {
     );
   };
 
-  const handleMissingItemStatusChange = (itemId, status) => {
-    setMissingItems((currentItems) =>
-      currentItems.map((item) =>
-        item.id === itemId
-          ? { ...item, status }
+  const handlePurchaseRequestStatusChange = (
+    requestId,
+    status
+  ) => {
+    setPurchaseRequests((currentRequests) =>
+      currentRequests.map((request) =>
+        request.id === requestId
+          ? { ...request, status }
+          : request
+      )
+    );
+  };
+
+  const handleCreatePurchaseOrder = (order) => {
+    setPurchaseOrders((currentOrders) => [
+      ...currentOrders,
+      {
+        ...order,
+        receiptRegistered: false,
+      },
+    ]);
+
+    order.requestIds?.forEach((requestId) => {
+      const request = purchaseRequests.find(
+        (item) => item.id === requestId
+      );
+
+      handlePurchaseRequestStatusChange(
+        requestId,
+        "En compra"
+      );
+
+      if (request) {
+        handleSaleStatusChange(
+          request.saleId,
+          "En proceso"
+        );
+      }
+    });
+  };
+
+  const handlePurchaseOrderStatusChange = (
+    orderId,
+    status
+  ) => {
+    setPurchaseOrders((currentOrders) =>
+      currentOrders.map((order) =>
+        order.id === orderId
+          ? { ...order, status }
+          : order
+      )
+    );
+  };
+
+  const handleRegisterPurchaseReceipt = (orderId) => {
+    const order = purchaseOrders.find(
+      (item) => item.id === orderId
+    );
+
+    if (!order || order.receiptRegistered) {
+      return;
+    }
+
+    setInventory((currentInventory) =>
+      currentInventory.map((inventoryItem) => {
+        const receivedItem = order.items.find(
+          (item) => item.productId === inventoryItem.id
+        );
+
+        if (!receivedItem) {
+          return inventoryItem;
+        }
+
+        return {
+          ...inventoryItem,
+          stock:
+            inventoryItem.stock + receivedItem.quantity,
+        };
+      })
+    );
+
+    setPurchaseOrders((currentOrders) =>
+      currentOrders.map((item) =>
+        item.id === orderId
+          ? {
+              ...item,
+              receiptRegistered: true,
+            }
           : item
       )
     );
+
+    order.requestIds?.forEach((requestId) => {
+      const request = purchaseRequests.find(
+        (item) => item.id === requestId
+      );
+
+      handlePurchaseRequestStatusChange(
+        requestId,
+        "Recibido"
+      );
+
+      if (request) {
+        handleSaleStatusChange(
+          request.saleId,
+          "Disponible"
+        );
+      }
+    });
   };
 
   return (
@@ -91,9 +225,21 @@ export default function DashboardLayout() {
               context={{
                 sales,
                 onCreateSale: handleCreateSale,
-                onStatusChange: handleStatusChange,
-                missingItems,
-                onMissingItemStatusChange: handleMissingItemStatusChange,
+                onSaleStatusChange: handleSaleStatusChange,
+
+                purchaseRequests,
+                onPurchaseRequestStatusChange:
+                  handlePurchaseRequestStatusChange,
+
+                purchaseOrders,
+                onCreatePurchaseOrder:
+                  handleCreatePurchaseOrder,
+                onPurchaseOrderStatusChange:
+                  handlePurchaseOrderStatusChange,
+                onRegisterPurchaseReceipt:
+                  handleRegisterPurchaseReceipt,
+
+                inventory,
               }}
             />
           </div>

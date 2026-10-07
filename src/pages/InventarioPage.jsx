@@ -1,19 +1,23 @@
+import { useOutletContext } from "react-router-dom";
+
 import { InventoryList } from "../features/inventario/components/InventoryList";
 
 export function InventarioPage() {
+  const { inventory } = useOutletContext();
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-[#17324c]">
+        <h1 className="text-2xl font-bold text-slate-800">
           Gestión de Inventario
-        </h2>
+        </h1>
 
         <p className="mt-1 text-sm text-slate-500">
-          Consulta y controla el stock de los productos registrados.
+          Controla las existencias, lotes y fechas de vencimiento de los productos.
         </p>
       </div>
 
-      <InventoryList />
+      <InventoryList inventory={inventory} />
     </div>
   );
 }

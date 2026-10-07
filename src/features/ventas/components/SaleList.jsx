@@ -18,13 +18,33 @@ export function SaleList({
         <table className="w-full min-w-[850px] text-sm">
           <thead className="bg-slate-50">
             <tr className="text-left text-slate-600">
-              <th className="px-6 py-3 font-medium">Venta</th>
-              <th className="px-6 py-3 font-medium">Cotización</th>
-              <th className="px-6 py-3 font-medium">Cliente</th>
-              <th className="px-6 py-3 font-medium">Fecha</th>
-              <th className="px-6 py-3 font-medium">Total</th>
-              <th className="px-6 py-3 font-medium">Estado</th>
-              <th className="px-6 py-3 font-medium">Acción</th>
+              <th className="px-6 py-3 font-medium">
+                Venta
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Cotización
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Cliente
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Fecha
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Total
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Estado
+              </th>
+
+              <th className="px-6 py-3 font-medium">
+                Acción
+              </th>
             </tr>
           </thead>
 
@@ -58,13 +78,13 @@ export function SaleList({
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${
-                        sale.status === "Pendiente de despacho"
+                        sale.status === "En proceso"
                           ? "bg-amber-100 text-amber-700"
-                          : sale.status === "En despacho"
-                            ? "bg-blue-100 text-blue-700"
+                          : sale.status === "Disponible"
+                            ? "bg-emerald-100 text-emerald-700"
                             : sale.status === "Entregada"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-slate-100 text-slate-700"
                       }`}
                     >
                       {sale.status}

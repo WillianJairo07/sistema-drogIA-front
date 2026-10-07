@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 import { PurchaseOrderForm } from "../features/ordenesCompra/components/PurchaseOrderForm";
 import { PurchaseOrderList } from "../features/ordenesCompra/components/PurchaseOrderList";
@@ -26,43 +28,46 @@ const initialProducts = [
     id: 1,
     name: "Paracetamol 500 mg",
     price: 5,
-    stock: 40,
   },
   {
     id: 2,
     name: "Alcohol 70%",
     price: 8,
-    stock: 20,
   },
   {
     id: 3,
     name: "Ibuprofeno 400 mg",
     price: 7.5,
-    stock: 45,
   },
 ];
 
 export function OrdenesCompraPage() {
-  const [orders, setOrders] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const location = useLocation();
+
+  const {
+    purchaseOrders,
+    onCreatePurchaseOrder,
+    onPurchaseOrderStatusChange,
+    onRegisterPurchaseReceipt,
+  } = useOutletContext();
+
+  const [showForm, setShowForm] = useState(
+    Boolean(location.state?.request)
+  );
+
+  const [selectedRequest, setSelectedRequest] = useState(
+    location.state?.request || null
+  );
 
   const handleCreateOrder = (order) => {
-    setOrders((currentOrders) => [
-      ...currentOrders,
-      order,
-    ]);
-
+    onCreatePurchaseOrder(order);
     setShowForm(false);
+    setSelectedRequest(null);
   };
 
-  const handleStatusChange = (orderId, status) => {
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === orderId
-          ? { ...order, status }
-          : order
-      )
-    );
+  const handleNewOrder = () => {
+    setSelectedRequest(null);
+    setShowForm(true);
   };
 
   return (
@@ -81,7 +86,7 @@ export function OrdenesCompraPage() {
         {!showForm && (
           <button
             type="button"
-            onClick={() => setShowForm(true)}
+            onClick={handleNewOrder}
             className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
           >
             Nueva Orden
@@ -93,13 +98,18 @@ export function OrdenesCompraPage() {
         <PurchaseOrderForm
           suppliers={initialSuppliers}
           products={initialProducts}
+          request={selectedRequest}
           onSave={handleCreateOrder}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setShowForm(false);
+            setSelectedRequest(null);
+          }}
         />
       ) : (
         <PurchaseOrderList
-          orders={orders}
-          onStatusChange={handleStatusChange}
+          orders={purchaseOrders}
+          onStatusChange={onPurchaseOrderStatusChange}
+          onRegisterReceipt={onRegisterPurchaseReceipt}
         />
       )}
     </div>

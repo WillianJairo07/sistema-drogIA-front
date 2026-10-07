@@ -7,10 +7,20 @@ import { SaleDetail } from "../features/ventas/components/SaleDetail";
 export function VentasPage() {
   const {
     sales,
-    onStatusChange,
+    onSaleStatusChange,
   } = useOutletContext();
 
   const [selectedSale, setSelectedSale] = useState(null);
+
+  const handleSaleStatusChange = (saleId, status) => {
+    onSaleStatusChange(saleId, status);
+
+    setSelectedSale((currentSale) =>
+      currentSale
+        ? { ...currentSale, status }
+        : currentSale
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -28,15 +38,7 @@ export function VentasPage() {
         <SaleDetail
           sale={selectedSale}
           onClose={() => setSelectedSale(null)}
-          onStatusChange={(saleId, status) => {
-            onStatusChange(saleId, status);
-
-            setSelectedSale((currentSale) =>
-              currentSale
-                ? { ...currentSale, status }
-                : currentSale
-            );
-          }}
+          onStatusChange={handleSaleStatusChange}
         />
       ) : (
         <SaleList
