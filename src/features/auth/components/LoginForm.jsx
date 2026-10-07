@@ -1,23 +1,30 @@
 import { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 import GoogleLoginButton from "./GoogleLoginButton";
+import { useAuth } from "../../../context/AuthContext";
+import { login } from "../services/authService";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+  const { login: saveSession } = useAuth();
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (username === "admin" && password === "123456") {
-      localStorage.setItem("token", "fake-jwt-token-12345");
-      navigate("/dashboard");
-    } else {
+    const user = login(username, password);
+
+    if (!user) {
       alert("Credenciales incorrectas");
+      return;
     }
+
+    saveSession(user);
+    navigate("/dashboard");
   };
 
   return (

@@ -1,4 +1,7 @@
+
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { rolePermissions } from "../../features/auth/config/permissions";
 import {
   LayoutDashboard,
   FileText,
@@ -33,9 +36,9 @@ const menuItems = [
     icon: Users,
   },
   {
-  label: "Usuarios",
-  path: "/dashboard/usuarios",
-  icon: UserCog,
+    label: "Usuarios",
+    path: "/dashboard/usuarios",
+    icon: UserCog,
   },
   {
     label: "Productos",
@@ -43,45 +46,53 @@ const menuItems = [
     icon: Package,
   },
   {
-  label: "Ventas",
-  path: "/dashboard/ventas",
-  icon: ShoppingCart,
+    label: "Ventas",
+    path: "/dashboard/ventas",
+    icon: ShoppingCart,
   },
   {
-  label: "Ventas-Compras",
-  path: "/dashboard/ventas-compras",
-  icon: ArrowLeftRight,
+    label: "Ventas-Compras",
+    path: "/dashboard/ventas-compras",
+    icon: ArrowLeftRight,
   },
   {
-  label: "Inventario",
-  path: "/dashboard/inventario",
-  icon: Warehouse,
+    label: "Inventario",
+    path: "/dashboard/inventario",
+    icon: Warehouse,
   },
   {
-  label: "Análisis de Correos",
-  path: "/dashboard/correos",
-  icon: Mail,
+    label: "Análisis de Correos",
+    path: "/dashboard/correos",
+    icon: Mail,
   },
   {
-  label: "Proveedores",
-  path: "/dashboard/proveedores",
-  icon: Truck,
+    label: "Proveedores",
+    path: "/dashboard/proveedores",
+    icon: Truck,
   },
   {
-  label: "Órdenes de Compra",
-  path: "/dashboard/ordenes-compra",
-  icon: ClipboardList,
+    label: "Órdenes de Compra",
+    path: "/dashboard/ordenes-compra",
+    icon: ClipboardList,
   },
   {
-  label: "Plazos y Penalidades",
-  path: "/dashboard/plazos",
-  icon: Clock3,
+    label: "Plazos y Penalidades",
+    path: "/dashboard/plazos",
+    icon: Clock3,
   },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
+  const { user, logout } = useAuth();
+
+  const allowedPaths = rolePermissions[user?.role] || [];
+
+  const visibleItems = menuItems.filter((item) =>
+    allowedPaths.includes(item.path)
+  );
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     window.location.href = "/login";
   };
 
@@ -107,7 +118,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Menú */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <div className="flex flex-col gap-1.5">
-            {menuItems.map((item) => {
+            {visibleItems.map((item) => {
               const Icon = item.icon;
 
               return (

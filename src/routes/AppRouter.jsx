@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "../pages/LoginPage";
@@ -34,19 +35,108 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         >
+          {/* Dashboard disponible para todos los roles */}
           <Route index element={<DashboardPage />} />
-          <Route path="cotizaciones" element={<CotizacionesPage />} />
-          <Route path="clientes" element={<ClientesPage />} />
-          <Route path="productos" element={<ProductosPage />} />
-          <Route path="ventas" element={<VentasPage />} />
-          <Route path="ventas-compras" element={<VentasComprasPage />} />
-          <Route path="inventario" element={<InventarioPage />} />
-          <Route path="correos" element={<CorreosPage />} />
-          <Route path="proveedores" element={<ProveedoresPage />} />
-          <Route path="ordenes-compra" element={<OrdenesCompraPage />} />
-          <Route path="plazos" element={<PlazosPage />} />
-          <Route path="usuarios" element={<UsuariosPage />} />
-          
+
+          {/* Rutas según permisos del usuario */}
+          <Route
+            path="cotizaciones"
+            element={
+              <ProtectedRoute path="/dashboard/cotizaciones">
+                <CotizacionesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="clientes"
+            element={
+              <ProtectedRoute path="/dashboard/clientes">
+                <ClientesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="productos"
+            element={
+              <ProtectedRoute path="/dashboard/productos">
+                <ProductosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="ventas"
+            element={
+              <ProtectedRoute path="/dashboard/ventas">
+                <VentasPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="ventas-compras"
+            element={
+              <ProtectedRoute path="/dashboard/ventas-compras">
+                <VentasComprasPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="inventario"
+            element={
+              <ProtectedRoute path="/dashboard/inventario">
+                <InventarioPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="correos"
+            element={
+              <ProtectedRoute path="/dashboard/correos">
+                <CorreosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="proveedores"
+            element={
+              <ProtectedRoute path="/dashboard/proveedores">
+                <ProveedoresPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="ordenes-compra"
+            element={
+              <ProtectedRoute path="/dashboard/ordenes-compra">
+                <OrdenesCompraPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="plazos"
+            element={
+              <ProtectedRoute path="/dashboard/plazos">
+                <PlazosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="usuarios"
+            element={
+              <ProtectedRoute path="/dashboard/usuarios">
+                <UsuariosPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Cualquier ruta inexistente */}
@@ -59,3 +149,4 @@ export default function AppRouter() {
     </BrowserRouter>
   );
 }
+
