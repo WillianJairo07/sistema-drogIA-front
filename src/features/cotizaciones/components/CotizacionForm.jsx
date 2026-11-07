@@ -1,6 +1,4 @@
-
 import { useState } from "react";
-
 import { CotizacionItems } from "./CotizacionItems";
 import { ProductSearch } from "../../productos/components/ProductSearch";
 import { ClientSearch } from "../../clientes/components/ClientSearch";
@@ -13,12 +11,10 @@ export function CotizacionForm({ onCancel, onGenerate }) {
 
   const addProduct = (product) => {
     setError("");
-
     setProducts((currentProducts) => {
       const existingProduct = currentProducts.find(
         (item) => item.id === product.id
       );
-
       if (existingProduct) {
         return currentProducts.map((item) =>
           item.id === product.id
@@ -26,7 +22,6 @@ export function CotizacionForm({ onCancel, onGenerate }) {
             : item
         );
       }
-
       return [...currentProducts, { ...product, quantity: 1 }];
     });
   };
@@ -77,12 +72,10 @@ export function CotizacionForm({ onCancel, onGenerate }) {
       setError("Selecciona un cliente para continuar.");
       return;
     }
-
     if (!date) {
       setError("Selecciona una fecha para continuar.");
       return;
     }
-
     if (products.length === 0) {
       setError("Agrega al menos un producto para continuar.");
       return;
@@ -101,53 +94,42 @@ export function CotizacionForm({ onCancel, onGenerate }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="cotizaciones-card">
       <div>
-        <h3 className="text-lg font-semibold text-[#17324c]">
-          Nueva Cotización
-        </h3>
-
-        <p className="mt-1 text-sm text-slate-500">
+        <h3 className="cotizaciones-card-title">Nueva Cotización</h3>
+        <p className="cotizaciones-header-subtitle">
           Registra los datos del cliente y los productos solicitados.
         </p>
       </div>
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="cotizaciones-form-grid">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Cliente
-          </label>
-
+          <label className="cotizaciones-label">Cliente</label>
           <ClientSearch onSelect={setClient} />
-
           {client && (
-            <p className="mt-2 text-sm text-slate-600">
+            <p style={{ marginTop: "8px", fontSize: "14px", color: "#475569" }}>
               Cliente seleccionado: {client.name}
             </p>
           )}
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Fecha
-          </label>
-
+          <label className="cotizaciones-label">Fecha</label>
           <input
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="cotizaciones-input"
           />
         </div>
       </div>
 
-      <div className="mt-8">
-        <div className="mb-4">
-          <h4 className="text-base font-semibold text-[#17324c]">
+      <div style={{ marginTop: "32px" }}>
+        <div style={{ marginBottom: "16px" }}>
+          <h4 style={{ fontSize: "16px", fontWeight: 600, color: "#17324c", margin: 0 }}>
             Productos
           </h4>
-
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="cotizaciones-header-subtitle">
             Busca y agrega los productos solicitados por el cliente.
           </p>
         </div>
@@ -163,39 +145,31 @@ export function CotizacionForm({ onCancel, onGenerate }) {
         />
       </div>
 
-      <div className="mt-6 flex justify-end">
-        <div className="w-full max-w-xs rounded-lg bg-slate-50 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-600">
-              Total
-            </span>
-
-            <span className="text-lg font-semibold text-[#17324c]">
+      <div className="cotizaciones-total-box">
+        <div className="cotizaciones-total-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "14px", fontWeight: 500, color: "#475569" }}>Total</span>
+            <span style={{ fontSize: "18px", fontWeight: 600, color: "#17324c" }}>
               S/ {total.toFixed(2)}
             </span>
           </div>
         </div>
       </div>
 
-      {error && (
-        <p className="mt-4 text-right text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="cotizaciones-error-text">{error}</p>}
 
-      <div className="mt-8 flex justify-end gap-3">
+      <div style={{ marginTop: "32px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="cotizaciones-btn-secondary"
         >
           Cancelar
         </button>
-
         <button
           type="button"
           onClick={handleGenerate}
-          className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+          className="cotizaciones-btn-primary"
         >
           Generar Cotización
         </button>

@@ -1,17 +1,19 @@
 import { EmailAnalysisPanel } from "../features/correos/components/EmailAnalysisPanel";
+import "../styles/correos.css";
 
 export function CorreosPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-[#17324c]">
-          Análisis de Correos
-        </h2>
+    <div className="correos-container">
+      <div className="correos-header-wrapper">
+        <div>
+          <h2 className="correos-header-title">
+            Análisis de Correos
+          </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
-          Analiza y clasifica las solicitudes recibidas mediante correo
-          institucional.
-        </p>
+          <p className="correos-header-subtitle">
+            Analiza y clasifica las solicitudes recibidas mediante correo institucional.
+          </p>
+        </div>
       </div>
 
       <EmailAnalysisPanel />

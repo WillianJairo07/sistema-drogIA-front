@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 const products = [
@@ -36,7 +35,6 @@ export function ProductSearch({ onSelect }) {
 
   const filteredProducts = products.filter((product) => {
     const value = search.toLowerCase();
-
     return (
       product.name.toLowerCase().includes(value) ||
       product.lot.toLowerCase().includes(value) ||
@@ -45,17 +43,17 @@ export function ProductSearch({ onSelect }) {
   });
 
   return (
-    <div className="relative">
+    <div className="product-search-wrapper">
       <input
         type="text"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="Buscar por nombre, lote o registro sanitario..."
-        className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+        className="productos-input"
       />
 
       {search && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+        <div className="product-dropdown-menu">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <button
@@ -65,19 +63,19 @@ export function ProductSearch({ onSelect }) {
                   onSelect(product);
                   setSearch("");
                 }}
-                className="w-full border-b border-slate-100 px-4 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                className="product-dropdown-item"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-700">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                  <span style={{ fontWeight: 500, color: "#334155" }}>
                     {product.name}
                   </span>
 
-                  <span className="font-medium text-[#17324c]">
+                  <span style={{ fontWeight: 600, color: "#17324c" }}>
                     S/ {product.price.toFixed(2)}
                   </span>
                 </div>
 
-                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                <div style={{ marginTop: "4px", display: "flex", flexWrap: "wrap", gap: "16px", fontSize: "12px", color: "#64748b" }}>
                   <span>Lote: {product.lot}</span>
                   <span>Registro: {product.healthRegistration}</span>
                   <span>Stock: {product.stock}</span>
@@ -86,7 +84,7 @@ export function ProductSearch({ onSelect }) {
               </button>
             ))
           ) : (
-            <p className="px-4 py-3 text-sm text-slate-500">
+            <p style={{ padding: "12px 16px", fontSize: "14px", color: "#64748b", margin: 0 }}>
               No se encontraron productos.
             </p>
           )}

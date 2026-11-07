@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+
 export function PurchaseOrderForm({
   suppliers,
   products,
@@ -133,42 +134,36 @@ export function PurchaseOrderForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
+    <form onSubmit={handleSubmit} className="ordenes-card">
       <div>
-        <h3 className="text-lg font-semibold text-[#17324c]">
+        <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#17324c", margin: 0 }}>
           Nueva Orden de Compra
         </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="ordenes-header-subtitle">
           Registra los productos que se solicitarán al proveedor.
         </p>
       </div>
 
       {request && (
-        <div className="mt-6 rounded-lg bg-slate-50 p-4">
-          <p className="text-sm font-medium text-slate-700">
+        <div className="ordenes-request-box">
+          <p style={{ fontSize: "14px", fontWeight: 500, color: "#334155", margin: 0 }}>
             Solicitud de venta
           </p>
 
-          <p className="mt-1 text-sm text-slate-500">
-            {request.saleNumber} · {request.product} ·{" "}
-            {request.quantity} unidades
+          <p style={{ marginTop: "4px", fontSize: "14px", color: "#64748b", margin: 0 }}>
+            {request.saleNumber} · {request.product} · {request.quantity} unidades
           </p>
         </div>
       )}
 
-      <div className="mt-6">
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Proveedor
-        </label>
+      <div style={{ marginTop: "24px" }}>
+        <label className="ordenes-label">Proveedor</label>
 
         <select
           value={supplierId}
           onChange={(event) => setSupplierId(event.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+          className="ordenes-select"
         >
           <option value="">Seleccionar proveedor...</option>
 
@@ -180,18 +175,16 @@ export function PurchaseOrderForm({
         </select>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-[1fr_180px_auto]">
+      <div className="ordenes-add-grid">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Producto
-          </label>
+          <label className="ordenes-label">Producto</label>
 
           <select
             value={selectedProductId}
             onChange={(event) =>
               setSelectedProductId(event.target.value)
             }
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="ordenes-select"
           >
             <option value="">Seleccionar producto...</option>
 
@@ -204,9 +197,7 @@ export function PurchaseOrderForm({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Cantidad
-          </label>
+          <label className="ordenes-label">Cantidad</label>
 
           <input
             type="number"
@@ -214,15 +205,15 @@ export function PurchaseOrderForm({
             value={quantity}
             onChange={(event) => setQuantity(event.target.value)}
             placeholder="Cantidad"
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="ordenes-input"
           />
         </div>
 
-        <div className="flex items-end">
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
           <button
             type="button"
             onClick={handleAddProduct}
-            className="w-full rounded-lg border border-[#17324c] px-4 py-2.5 text-sm font-medium text-[#17324c] hover:bg-slate-50"
+            className="ordenes-btn-outline"
           >
             Agregar
           </button>
@@ -230,61 +221,44 @@ export function PurchaseOrderForm({
       </div>
 
       {items.length > 0 && (
-        <div className="mt-6 overflow-x-auto rounded-lg border border-slate-200">
-          <table className="w-full min-w-[650px] text-sm">
-            <thead className="bg-slate-50">
-              <tr className="text-left text-slate-600">
-                <th className="px-4 py-3 font-medium">
-                  Producto
-                </th>
-
-                <th className="px-4 py-3 font-medium">
-                  Cantidad
-                </th>
-
-                <th className="px-4 py-3 font-medium">
-                  Precio
-                </th>
-
-                <th className="px-4 py-3 font-medium">
-                  Subtotal
-                </th>
-
-                <th className="px-4 py-3 text-right font-medium">
-                  Acción
-                </th>
+        <div className="ordenes-table-wrapper">
+          <table className="ordenes-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+                <th style={{ textAlign: "right" }}>Acción</th>
               </tr>
             </thead>
 
             <tbody>
               {items.map((item) => (
-                <tr
-                  key={item.productId}
-                  className="border-t border-slate-200"
-                >
-                  <td className="px-4 py-4 font-medium text-slate-700">
+                <tr key={item.productId}>
+                  <td style={{ fontWeight: 500, color: "#334155" }}>
                     {item.product}
                   </td>
 
-                  <td className="px-4 py-4 text-slate-600">
+                  <td style={{ color: "#64748b" }}>
                     {item.quantity}
                   </td>
 
-                  <td className="whitespace-nowrap px-4 py-4 text-slate-600">
+                  <td style={{ whiteSpace: "nowrap", color: "#64748b" }}>
                     S/ {item.price.toFixed(2)}
                   </td>
 
-                  <td className="whitespace-nowrap px-4 py-4 font-medium text-slate-700">
+                  <td style={{ whiteSpace: "nowrap", fontWeight: 500, color: "#334155" }}>
                     S/ {item.subtotal.toFixed(2)}
                   </td>
 
-                  <td className="px-4 py-4 text-right">
+                  <td style={{ textAlign: "right" }}>
                     <button
                       type="button"
                       onClick={() =>
                         handleRemoveProduct(item.productId)
                       }
-                      className="whitespace-nowrap text-sm font-medium text-red-600 hover:underline"
+                      style={{ background: "none", border: "none", color: "#dc2626", fontSize: "14px", fontWeight: 500, cursor: "pointer" }}
                     >
                       Eliminar
                     </button>
@@ -296,24 +270,20 @@ export function PurchaseOrderForm({
         </div>
       )}
 
-      {error && (
-        <p className="mt-4 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="ordenes-error-text">{error}</p>}
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="ordenes-btn-secondary"
         >
           Cancelar
         </button>
 
         <button
           type="submit"
-          className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+          className="ordenes-btn-primary"
         >
           Registrar Orden
         </button>

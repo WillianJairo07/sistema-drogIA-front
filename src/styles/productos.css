@@ -1,0 +1,227 @@
+/* ==========================================================
+   ESTILOS DE PRODUCTOS
+   ========================================================== */
+
+/* Contenedor principal de la vista */
+.productos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.productos-header-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .productos-header-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.productos-header-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #17324c;
+  margin: 0;
+}
+
+.productos-header-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Tarjetas y contenedores blancos generales */
+.productos-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Botones principales y secundarios */
+.productos-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #17324c;
+  color: #ffffff;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.productos-btn-primary:hover {
+  background-color: #244b6b;
+}
+
+.productos-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: transparent;
+  color: #475569;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.productos-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+/* Formularios y grillas del formulario */
+.productos-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .productos-form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.productos-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.productos-input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.productos-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* Tablas del módulo */
+.productos-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.productos-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.productos-table th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.productos-table td {
+  padding: 16px 20px;
+  border-top: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.productos-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Botones de acción con iconos en la tabla */
+.productos-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  color: #64748b;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.productos-action-btn:hover {
+  background-color: #f1f5f9;
+  color: #17324c;
+}
+
+.productos-action-btn-danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Estilos para el buscador desplegable (ProductSearch) */
+.product-search-wrapper {
+  position: relative;
+}
+
+.product-dropdown-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.product-dropdown-item {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: 12px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.product-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.product-dropdown-item:hover {
+  background-color: #f8fafc;
+}

@@ -1,37 +1,30 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-
 import { SaleList } from "../features/ventas/components/SaleList";
 import { SaleDetail } from "../features/ventas/components/SaleDetail";
+import "../styles/ventas.css";
 
 export function VentasPage() {
-  const {
-    sales,
-    onSaleStatusChange,
-  } = useOutletContext();
-
+  const { sales, onSaleStatusChange } = useOutletContext();
   const [selectedSale, setSelectedSale] = useState(null);
 
   const handleSaleStatusChange = (saleId, status) => {
     onSaleStatusChange(saleId, status);
 
     setSelectedSale((currentSale) =>
-      currentSale
-        ? { ...currentSale, status }
-        : currentSale
+      currentSale ? { ...currentSale, status } : currentSale
     );
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-[#17324c]">
-          Gestión de Ventas
-        </h2>
-
-        <p className="mt-1 text-sm text-slate-500">
-          Consulta y controla las ventas generadas desde las cotizaciones aceptadas.
-        </p>
+    <div className="ventas-container">
+      <div className="ventas-header-wrapper">
+        <div>
+          <h2 className="ventas-header-title">Gestión de Ventas</h2>
+          <p className="ventas-header-subtitle">
+            Consulta y controla las ventas generadas desde las cotizaciones aceptadas.
+          </p>
+        </div>
       </div>
 
       {selectedSale ? (

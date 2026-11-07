@@ -1,82 +1,61 @@
+
+
 export function PurchaseOrderList({
   orders,
   onStatusChange,
   onRegisterReceipt,
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-[#17324c]">
+    <div className="ordenes-card" style={{ padding: 0, overflow: "hidden" }}>
+      <div className="ordenes-card-header" style={{ padding: "24px", margin: 0 }}>
+        <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#17324c", margin: 0 }}>
           Órdenes de compra
         </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="ordenes-header-subtitle">
           Consulta y controla las órdenes realizadas a los proveedores.
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1050px] text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-left text-slate-600">
-              <th className="px-6 py-3 font-medium">
-                Orden
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Proveedor
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Fecha
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Productos
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Total
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Estado
-              </th>
-
-              <th className="px-6 py-3 text-right font-medium">
-                Acción
-              </th>
+      <div className="ordenes-table-wrapper" style={{ margin: 0, border: "none", borderRadius: 0 }}>
+        <table className="ordenes-table">
+          <thead>
+            <tr>
+              <th>Orden</th>
+              <th>Proveedor</th>
+              <th>Fecha</th>
+              <th>Productos</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th style={{ textAlign: "right" }}>Acción</th>
             </tr>
           </thead>
 
           <tbody>
             {orders.length > 0 ? (
               orders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="border-t border-slate-200"
-                >
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-700">
+                <tr key={order.id}>
+                  <td style={{ fontWeight: 500, color: "#334155", whiteSpace: "nowrap" }}>
                     {order.number}
                   </td>
 
-                  <td className="px-6 py-4 text-slate-600">
+                  <td style={{ color: "#475569" }}>
                     {order.supplier.name}
                   </td>
 
-                  <td className="whitespace-nowrap px-6 py-4 text-slate-500">
+                  <td style={{ color: "#64748b", whiteSpace: "nowrap" }}>
                     {order.date}
                   </td>
 
-                  <td className="px-6 py-4 text-slate-600">
+                  <td style={{ color: "#64748b" }}>
                     {order.items.length}
                   </td>
 
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-700">
+                  <td style={{ fontWeight: 500, color: "#334155", whiteSpace: "nowrap" }}>
                     S/ {order.total.toFixed(2)}
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td>
                     <select
                       value={order.status}
                       onChange={(event) =>
@@ -85,35 +64,24 @@ export function PurchaseOrderList({
                           event.target.value
                         )
                       }
-                      className={`rounded-full border-0 px-2 py-1 text-xs font-medium outline-none ${
+                      className={`ordenes-status-select ${
                         order.status === "Pendiente"
-                          ? "bg-amber-100 text-amber-700"
+                          ? "badge-orden-pendiente"
                           : order.status === "Enviada"
-                            ? "bg-blue-100 text-blue-700"
-                            : order.status === "Recibida"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-red-100 text-red-700"
+                          ? "badge-orden-enviada"
+                          : order.status === "Recibida"
+                          ? "badge-orden-recibida"
+                          : "badge-orden-cancelada"
                       }`}
                     >
-                      <option value="Pendiente">
-                        Pendiente
-                      </option>
-
-                      <option value="Enviada">
-                        Enviada
-                      </option>
-
-                      <option value="Recibida">
-                        Recibida
-                      </option>
-
-                      <option value="Cancelada">
-                        Cancelada
-                      </option>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Enviada">Enviada</option>
+                      <option value="Recibida">Recibida</option>
+                      <option value="Cancelada">Cancelada</option>
                     </select>
                   </td>
 
-                  <td className="px-6 py-4 text-right">
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     {order.status === "Recibida" &&
                     !order.receiptRegistered ? (
                       <button
@@ -121,16 +89,17 @@ export function PurchaseOrderList({
                         onClick={() =>
                           onRegisterReceipt(order.id)
                         }
-                        className="rounded-lg bg-[#17324c] px-3 py-2 text-xs font-medium text-white hover:bg-[#234968]"
+                        className="ordenes-btn-primary"
+                        style={{ padding: "6px 12px", fontSize: "12px" }}
                       >
                         Registrar recepción
                       </button>
                     ) : order.receiptRegistered ? (
-                      <span className="text-xs font-medium text-emerald-600">
+                      <span style={{ fontSize: "12px", fontWeight: 500, color: "#059669" }}>
                         Recepción registrada
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-400">
+                      <span style={{ fontSize: "12px", color: "#94a3b8" }}>
                         —
                       </span>
                     )}
@@ -141,7 +110,7 @@ export function PurchaseOrderList({
               <tr>
                 <td
                   colSpan="7"
-                  className="px-6 py-8 text-center text-slate-500"
+                  style={{ textAlign: "center", color: "#64748b", padding: "32px" }}
                 >
                   No hay órdenes de compra registradas.
                 </td>

@@ -1,7 +1,7 @@
 import { useState } from "react";
-
 import { SupplierForm } from "../features/proveedores/components/SupplierForm";
 import { SupplierList } from "../features/proveedores/components/SupplierList";
+import "../styles/proveedores.css";
 
 const initialSuppliers = [
   {
@@ -35,7 +35,6 @@ export function ProveedoresPage() {
 
   const filteredSuppliers = suppliers.filter((supplier) => {
     const value = search.toLowerCase();
-
     return (
       supplier.name.toLowerCase().includes(value) ||
       supplier.document.includes(search)
@@ -44,9 +43,7 @@ export function ProveedoresPage() {
 
   const handleSave = (supplier) => {
     setSuppliers((currentSuppliers) => {
-      const exists = currentSuppliers.some(
-        (item) => item.id === supplier.id
-      );
+      const exists = currentSuppliers.some((item) => item.id === supplier.id);
 
       if (exists) {
         return currentSuppliers.map((item) =>
@@ -68,9 +65,7 @@ export function ProveedoresPage() {
 
   const handleDelete = (supplierId) => {
     setSuppliers((currentSuppliers) =>
-      currentSuppliers.filter(
-        (supplier) => supplier.id !== supplierId
-      )
+      currentSuppliers.filter((supplier) => supplier.id !== supplierId)
     );
   };
 
@@ -85,14 +80,11 @@ export function ProveedoresPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="proveedores-container">
+      <div className="proveedores-header-wrapper">
         <div>
-          <h2 className="text-2xl font-semibold text-[#17324c]">
-            Gestión de Proveedores
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="proveedores-header-title">Gestión de Proveedores</h2>
+          <p className="proveedores-header-subtitle">
             Registra y administra los proveedores de la empresa.
           </p>
         </div>
@@ -101,7 +93,7 @@ export function ProveedoresPage() {
           <button
             type="button"
             onClick={handleNewSupplier}
-            className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+            className="proveedores-btn-primary"
           >
             Nuevo Proveedor
           </button>
@@ -116,13 +108,13 @@ export function ProveedoresPage() {
         />
       ) : (
         <>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="proveedores-card" style={{ padding: "16px" }}>
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por nombre o RUC..."
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+              className="proveedores-input"
             />
           </div>
 

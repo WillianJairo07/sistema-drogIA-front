@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+
 export function DeliveryDeadlineForm({ orders, onSave, onCancel }) {
   const [orderId, setOrderId] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -33,30 +34,25 @@ export function DeliveryDeadlineForm({ orders, onSave, onCancel }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
+    <form onSubmit={handleSubmit} className="plazos-card">
       <div>
-        <h3 className="text-lg font-semibold text-[#17324c]">
+        <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#17324c", margin: 0 }}>
           Nuevo plazo de entrega
         </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="plazos-header-subtitle">
           Registra el plazo acordado para una orden de compra.
         </p>
       </div>
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="plazos-form-grid">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Orden de compra
-          </label>
+          <label className="plazos-label">Orden de compra</label>
 
           <select
             value={orderId}
             onChange={(event) => setOrderId(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="plazos-select"
           >
             <option value="">Seleccionar orden...</option>
 
@@ -69,37 +65,31 @@ export function DeliveryDeadlineForm({ orders, onSave, onCancel }) {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Fecha límite de entrega
-          </label>
+          <label className="plazos-label">Fecha límite de entrega</label>
 
           <input
             type="date"
             value={deadline}
             onChange={(event) => setDeadline(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="plazos-input"
           />
         </div>
       </div>
 
-      {error && (
-        <p className="mt-4 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="plazos-error-text">{error}</p>}
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="plazos-btn-secondary"
         >
           Cancelar
         </button>
 
         <button
           type="submit"
-          className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+          className="plazos-btn-primary"
         >
           Registrar Plazo
         </button>

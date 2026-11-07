@@ -1,37 +1,13 @@
 import { useState } from "react";
-
 import { UserForm } from "../features/usuarios/components/UserForm";
 import { UserList } from "../features/usuarios/components/UserList";
+import "../styles/usuarios.css"; 
 
 const initialUsers = [
-  {
-    id: 1,
-    name: "Carlos Mendoza",
-    email: "carlos@drogia.com",
-    role: "Vendedor",
-    active: true,
-  },
-  {
-    id: 2,
-    name: "Ana Torres",
-    email: "ana@drogia.com",
-    role: "Comprador",
-    active: true,
-  },
-  {
-    id: 3,
-    name: "Luis Ramos",
-    email: "luis@drogia.com",
-    role: "Almacenero",
-    active: false,
-  },
-  {
-    id: 4,
-    name: "Administrador",
-    email: "admin@drogia.com",
-    role: "Administrador",
-    active: true,
-  },
+  { id: 1, name: "Carlos Mendoza", email: "carlos@drogia.com", role: "Vendedor", active: true },
+  { id: 2, name: "Ana Torres", email: "ana@drogia.com", role: "Comprador", active: true },
+  { id: 3, name: "Luis Ramos", email: "luis@drogia.com", role: "Almacenero", active: false },
+  { id: 4, name: "Administrador", email: "admin@drogia.com", role: "Administrador", active: true },
 ];
 
 export default function UsuariosPage() {
@@ -42,7 +18,6 @@ export default function UsuariosPage() {
 
   const filteredUsers = users.filter((user) => {
     const value = search.toLowerCase();
-
     return (
       user.name.toLowerCase().includes(value) ||
       user.email.toLowerCase().includes(value) ||
@@ -53,13 +28,11 @@ export default function UsuariosPage() {
   const handleSave = (user) => {
     setUsers((currentUsers) => {
       const exists = currentUsers.some((item) => item.id === user.id);
-
       if (exists) {
         return currentUsers.map((item) =>
           item.id === user.id ? user : item
         );
       }
-
       return [...currentUsers, user];
     });
 
@@ -75,9 +48,7 @@ export default function UsuariosPage() {
   const handleToggleStatus = (userId) => {
     setUsers((currentUsers) =>
       currentUsers.map((user) =>
-        user.id === userId
-          ? { ...user, active: !user.active }
-          : user
+        user.id === userId ? { ...user, active: !user.active } : user
       )
     );
   };
@@ -93,14 +64,11 @@ export default function UsuariosPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="usuarios-container">
+      <div className="usuarios-header-wrapper">
         <div>
-          <h2 className="text-2xl font-semibold text-[#17324c]">
-            Gestión de Usuarios
-          </h2>
-
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="usuarios-header-title">Gestión de Usuarios</h2>
+          <p className="usuarios-header-subtitle">
             Administra las cuentas, roles y estado de los usuarios.
           </p>
         </div>
@@ -109,7 +77,7 @@ export default function UsuariosPage() {
           <button
             type="button"
             onClick={handleNewUser}
-            className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+            className="usuarios-btn-primary"
           >
             Nuevo Usuario
           </button>
@@ -124,13 +92,13 @@ export default function UsuariosPage() {
         />
       ) : (
         <>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="usuarios-card" style={{ padding: "16px" }}>
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por nombre, correo o rol..."
-              className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+              className="usuarios-input"
             />
           </div>
 

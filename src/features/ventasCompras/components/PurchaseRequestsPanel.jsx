@@ -1,83 +1,55 @@
-
 import { useNavigate } from "react-router-dom";
 
-export function PurchaseRequestsPanel({
-  items,
-}) {
+
+export function PurchaseRequestsPanel({ items }) {
   const navigate = useNavigate();
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-[#17324c]">
+    <div className="compras-card">
+      <div className="compras-card-header">
+        <h3 className="compras-header-title" style={{ fontSize: "18px" }}>
           Solicitudes de compra
         </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="compras-header-subtitle">
           Productos de ventas aceptadas que deben ser adquiridos por Compras.
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[750px] text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-left text-slate-600">
-              <th className="px-6 py-3 font-medium">
-                Venta
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Producto
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Cantidad
-              </th>
-
-              <th className="px-6 py-3 font-medium">
-                Estado
-              </th>
-
-              <th className="px-6 py-3 text-right font-medium">
-                Acción
-              </th>
+      <div className="compras-table-wrapper">
+        <table className="compras-table">
+          <thead>
+            <tr>
+              <th>Venta</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th style={{textAlign: "center"}}>Estado</th>
+              <th style={{ textAlign: "center" }}>Acción</th>
             </tr>
           </thead>
 
           <tbody>
             {items.length > 0 ? (
               items.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-t border-slate-200"
-                >
-                  <td className="px-6 py-4 font-medium text-slate-700">
-                    {item.saleNumber}
-                  </td>
-
-                  <td className="px-6 py-4 text-slate-600">
-                    {item.product}
-                  </td>
-
-                  <td className="px-6 py-4 text-slate-600">
-                    {item.quantity}
-                  </td>
-
-                  <td className="px-6 py-4">
+                <tr key={item.id}>
+                  <td style={{ fontWeight: 500 }}>{item.saleNumber}</td>
+                  <td style={{ color: "#475569" }}>{item.product}</td>
+                  <td style={{ color: "#475569" }}>{item.quantity}</td>
+                  <td style={{textAlign: "center"}}>
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      className={`badge-compra ${
                         item.status === "Pendiente de compra"
-                          ? "bg-amber-100 text-amber-700"
+                          ? "badge-pendiente"
                           : item.status === "En compra"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-emerald-100 text-emerald-700"
+                          ? "badge-en-compra"
+                          : "badge-recibido"
                       }`}
                     >
                       {item.status}
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-right">
+                  <td style={{ textAlign: "center" }}>
                     {item.status === "Pendiente de compra" && (
                       <button
                         type="button"
@@ -88,20 +60,20 @@ export function PurchaseRequestsPanel({
                             },
                           })
                         }
-                        className="rounded-lg bg-[#17324c] px-3 py-2 text-xs font-medium text-white hover:bg-[#234968]"
+                        className="compras-btn-primary"
                       >
                         Crear orden de compra
                       </button>
                     )}
 
                     {item.status === "En compra" && (
-                      <span className="text-xs text-blue-600">
+                      <span className="compras-text-en-proceso">
                         Orden en proceso
                       </span>
                     )}
 
                     {item.status === "Recibido" && (
-                      <span className="text-xs text-emerald-600">
+                      <span className="compras-text-recibido">
                         Producto recibido
                       </span>
                     )}
@@ -112,7 +84,7 @@ export function PurchaseRequestsPanel({
               <tr>
                 <td
                   colSpan="5"
-                  className="px-6 py-8 text-center text-slate-500"
+                  style={{ textAlign: "center", color: "#64748b", padding: "32px" }}
                 >
                   No hay solicitudes de compra.
                 </td>

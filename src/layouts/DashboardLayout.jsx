@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
+import "../styles/dashboard.css"; 
 
 const initialInventory = [
   {
@@ -76,22 +77,15 @@ export default function DashboardLayout() {
   const handleSaleStatusChange = (saleId, status) => {
     setSales((currentSales) =>
       currentSales.map((sale) =>
-        sale.id === saleId
-          ? { ...sale, status }
-          : sale
+        sale.id === saleId ? { ...sale, status } : sale
       )
     );
   };
 
-  const handlePurchaseRequestStatusChange = (
-    requestId,
-    status
-  ) => {
+  const handlePurchaseRequestStatusChange = (requestId, status) => {
     setPurchaseRequests((currentRequests) =>
       currentRequests.map((request) =>
-        request.id === requestId
-          ? { ...request, status }
-          : request
+        request.id === requestId ? { ...request, status } : request
       )
     );
   };
@@ -110,37 +104,24 @@ export default function DashboardLayout() {
         (item) => item.id === requestId
       );
 
-      handlePurchaseRequestStatusChange(
-        requestId,
-        "En compra"
-      );
+      handlePurchaseRequestStatusChange(requestId, "En compra");
 
       if (request) {
-        handleSaleStatusChange(
-          request.saleId,
-          "En proceso"
-        );
+        handleSaleStatusChange(request.saleId, "En proceso");
       }
     });
   };
 
-  const handlePurchaseOrderStatusChange = (
-    orderId,
-    status
-  ) => {
+  const handlePurchaseOrderStatusChange = (orderId, status) => {
     setPurchaseOrders((currentOrders) =>
       currentOrders.map((order) =>
-        order.id === orderId
-          ? { ...order, status }
-          : order
+        order.id === orderId ? { ...order, status } : order
       )
     );
   };
 
   const handleRegisterPurchaseReceipt = (orderId) => {
-    const order = purchaseOrders.find(
-      (item) => item.id === orderId
-    );
+    const order = purchaseOrders.find((item) => item.id === orderId);
 
     if (!order || order.receiptRegistered) {
       return;
@@ -158,8 +139,7 @@ export default function DashboardLayout() {
 
         return {
           ...inventoryItem,
-          stock:
-            inventoryItem.stock + receivedItem.quantity,
+          stock: inventoryItem.stock + receivedItem.quantity,
         };
       })
     );
@@ -180,31 +160,22 @@ export default function DashboardLayout() {
         (item) => item.id === requestId
       );
 
-      handlePurchaseRequestStatusChange(
-        requestId,
-        "Recibido"
-      );
+      handlePurchaseRequestStatusChange(requestId, "Recibido");
 
       if (request) {
-        handleSaleStatusChange(
-          request.saleId,
-          "Disponible"
-        );
+        handleSaleStatusChange(request.saleId, "Disponible");
       }
     });
   };
 
   return (
-    <div className="relative flex h-screen w-screen overflow-hidden bg-[#fcf6f4] font-lexend">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={closeSidebar}
-      />
+    <div className="dashboard-screen">
+      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
       <button
         type="button"
         onClick={toggleSidebar}
-        className="absolute top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-sky-300 bg-white text-[#17324c] shadow-lg ring-2 ring-sky-400/20 transition-all duration-300 hover:bg-slate-50"
+        className="sidebar-toggle-btn"
         style={{
           left: sidebarOpen ? "244px" : "-20px",
         }}
@@ -216,11 +187,11 @@ export default function DashboardLayout() {
         )}
       </button>
 
-      <div className="flex h-full flex-1 flex-col overflow-hidden">
+      <div className="dashboard-main-container">
         <Topbar onToggleSidebar={toggleSidebar} />
 
-        <main className="flex-1 overflow-y-auto bg-[#fcf6f4] p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">
+        <main className="dashboard-content-area">
+          <div className="dashboard-content-wrapper">
             <Outlet
               context={{
                 sales,
@@ -232,8 +203,7 @@ export default function DashboardLayout() {
                   handlePurchaseRequestStatusChange,
 
                 purchaseOrders,
-                onCreatePurchaseOrder:
-                  handleCreatePurchaseOrder,
+                onCreatePurchaseOrder: handleCreatePurchaseOrder,
                 onPurchaseOrderStatusChange:
                   handlePurchaseOrderStatusChange,
                 onRegisterPurchaseReceipt:
@@ -247,10 +217,7 @@ export default function DashboardLayout() {
       </div>
 
       {sidebarOpen && (
-        <div
-          onClick={closeSidebar}
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs lg:hidden"
-        />
+        <div onClick={closeSidebar} className="sidebar-backdrop" />
       )}
     </div>
   );

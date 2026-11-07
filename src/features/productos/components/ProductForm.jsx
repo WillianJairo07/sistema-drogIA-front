@@ -36,48 +36,38 @@ export function ProductForm({ product, onSave, onCancel }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl bg-white p-5 shadow-sm"
-    >
-      <h2 className="mb-5 text-lg font-semibold text-slate-800">
+    <form onSubmit={handleSubmit} className="productos-card">
+      <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#17324c", marginBottom: "20px", marginTop: 0 }}>
         {product ? "Editar producto" : "Nuevo producto"}
       </h2>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="productos-form-grid">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-            Nombre
-          </label>
-
+          <label className="productos-label">Nombre</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+            className="productos-input"
+            placeholder="Ej. Paracetamol"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-            Registro sanitario
-          </label>
-
+          <label className="productos-label">Registro sanitario</label>
           <input
             type="text"
             name="healthRegistration"
             value={formData.healthRegistration}
             onChange={handleChange}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+            className="productos-input"
+            placeholder="Ej. RSA-12345"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">
-            Precio
-          </label>
-
+          <label className="productos-label">Precio</label>
           <input
             type="number"
             name="price"
@@ -85,23 +75,24 @@ export function ProductForm({ product, onSave, onCancel }) {
             step="0.01"
             value={formData.price}
             onChange={handleChange}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+            className="productos-input"
+            placeholder="0.00"
           />
         </div>
       </div>
 
-      <div className="mt-5 flex justify-end gap-3">
+      <div style={{ marginTop: "20px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          className="productos-btn-secondary"
         >
           Cancelar
         </button>
 
         <button
           type="submit"
-          className="rounded-lg bg-[#17324c] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#244b6b]"
+          className="productos-btn-primary"
         >
           Guardar producto
         </button>

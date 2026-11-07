@@ -1,77 +1,56 @@
-export function ClientList({
-  clients,
-  onEdit,
-  onDelete,
-}) {
+import { Edit, Trash2 } from "lucide-react";
+
+export function ClientList({ clients, onEdit, onDelete }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-left text-slate-600">
-              <th className="px-6 py-3 font-medium">
-                Cliente
-              </th>
+    <div className="clientes-table-wrapper">
+      <table className="clientes-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>RUC</th>
+            <th style={{ textAlign: "right" }}>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clients.length > 0 ? (
+            clients.map((client) => (
+              <tr key={client.id}>
+                <td style={{ fontWeight: 500 }}>{client.name}</td>
+                <td style={{ color: "#64748b" }}>{client.document}</td>
+                <td style={{ textAlign: "right" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                    {/* Botón Editar con Icono */}
+                    <button
+                      type="button"
+                      onClick={() => onEdit(client)}
+                      title="Editar cliente"
+                      className="clientes-action-btn"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
 
-              <th className="px-6 py-3 font-medium">
-                RUC
-              </th>
-
-              <th className="px-6 py-3 text-right font-medium">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {clients.length > 0 ? (
-              clients.map((client) => (
-                <tr
-                  key={client.id}
-                  className="border-t border-slate-200"
-                >
-                  <td className="px-6 py-4 font-medium text-slate-700">
-                    {client.name}
-                  </td>
-
-                  <td className="px-6 py-4 text-slate-500">
-                    {client.document}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-3">
-                      <button
-                        type="button"
-                        onClick={() => onEdit(client)}
-                        className="text-sm font-medium text-[#17324c] hover:underline"
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => onDelete(client.id)}
-                        className="text-sm font-medium text-red-600 hover:underline"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="3"
-                  className="px-6 py-8 text-center text-slate-500"
-                >
-                  No se encontraron clientes.
+                    {/* Botón Eliminar con Icono */}
+                    <button
+                      type="button"
+                      onClick={() => onDelete(client.id)}
+                      title="Eliminar cliente"
+                      className="clientes-action-btn clientes-action-btn-danger"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" style={{ textAlign: "center", color: "#64748b", padding: "32px" }}>
+                No se encontraron clientes.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

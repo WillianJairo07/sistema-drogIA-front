@@ -45,98 +45,76 @@ export function SupplierForm({ supplier, onSave, onCancel }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-    >
+    <form onSubmit={handleSubmit} className="proveedores-card">
       <div>
-        <h3 className="text-lg font-semibold text-[#17324c]">
+        <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#17324c", margin: 0 }}>
           {supplier ? "Editar Proveedor" : "Nuevo Proveedor"}
         </h3>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="proveedores-header-subtitle">
           Registra la información del proveedor.
         </p>
       </div>
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="proveedores-form-grid">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Nombre o razón social
-          </label>
-
+          <label className="proveedores-label">Nombre o razón social</label>
           <input
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Ej. Laboratorios del Sur S.A.C."
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="proveedores-input"
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            RUC
-          </label>
-
+          <label className="proveedores-label">RUC</label>
           <input
             type="text"
             value={document}
             onChange={(event) => setDocument(event.target.value)}
             placeholder="Ej. 20123456789"
             maxLength={11}
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="proveedores-input"
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Teléfono
-          </label>
-
+          <label className="proveedores-label">Teléfono</label>
           <input
             type="text"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
             placeholder="Ej. 987654321"
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="proveedores-input"
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
-            Correo electrónico
-          </label>
-
+          <label className="proveedores-label">Correo electrónico</label>
           <input
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Ej. contacto@proveedor.com"
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none focus:border-[#17324c]"
+            className="proveedores-input"
           />
         </div>
       </div>
 
-      {error && (
-        <p className="mt-4 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="proveedores-error-text">{error}</p>}
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="proveedores-btn-secondary"
         >
           Cancelar
         </button>
 
-        <button
-          type="submit"
-          className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
-        >
+        <button type="submit" className="proveedores-btn-primary">
           {supplier ? "Guardar Cambios" : "Registrar Proveedor"}
         </button>
       </div>

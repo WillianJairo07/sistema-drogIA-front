@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 
 import { PurchaseOrderForm } from "../features/ordenesCompra/components/PurchaseOrderForm";
 import { PurchaseOrderList } from "../features/ordenesCompra/components/PurchaseOrderList";
+import "../styles/ordenesCompra.css";
 
 const initialSuppliers = [
   {
@@ -71,14 +72,14 @@ export function OrdenesCompraPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="ordenes-container">
+      <div className="ordenes-header-wrapper">
         <div>
-          <h2 className="text-2xl font-semibold text-[#17324c]">
+          <h2 className="ordenes-header-title">
             Gestión de Órdenes de Compra
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="ordenes-header-subtitle">
             Registra y controla las compras realizadas a los proveedores.
           </p>
         </div>
@@ -87,7 +88,7 @@ export function OrdenesCompraPage() {
           <button
             type="button"
             onClick={handleNewOrder}
-            className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+            className="ordenes-btn-primary"
           >
             Nueva Orden
           </button>

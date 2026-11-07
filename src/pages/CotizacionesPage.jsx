@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-
 import { CotizacionForm } from "../features/cotizaciones/components/CotizacionForm";
+import "../styles/cotizaciones.css";
 
 export function CotizacionesPage() {
   const { onCreateSale } = useOutletContext();
@@ -13,21 +13,15 @@ export function CotizacionesPage() {
   const handleCreateQuote = (quote) => {
     setQuotes((currentQuotes) => [
       ...currentQuotes,
-      {
-        ...quote,
-        status: "Pendiente",
-      },
+      { ...quote, status: "Pendiente" },
     ]);
-
     setShowForm(false);
   };
 
   const handleAcceptQuote = (quoteId) => {
     setQuotes((currentQuotes) =>
       currentQuotes.map((quote) =>
-        quote.id === quoteId
-          ? { ...quote, status: "Aceptada" }
-          : quote
+        quote.id === quoteId ? { ...quote, status: "Aceptada" } : quote
       )
     );
   };
@@ -64,29 +58,22 @@ export function CotizacionesPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="cotizaciones-container">
       <div>
-        <h2 className="text-2xl font-semibold text-[#17324c]">
-          Gestión de Cotizaciones
-        </h2>
-
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="cotizaciones-header-title">Gestión de Cotizaciones</h2>
+        <p className="cotizaciones-header-subtitle">
           Consulta y gestiona las cotizaciones de los clientes.
         </p>
       </div>
 
-      {message && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          {message}
-        </div>
-      )}
+      {message && <div className="cotizaciones-alert">{message}</div>}
 
       {!showForm && (
-        <div className="flex justify-end">
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="rounded-lg bg-[#17324c] px-4 py-2 text-sm font-medium text-white hover:bg-[#234968]"
+            className="cotizaciones-btn-primary"
           >
             Nueva Cotización
           </button>
@@ -101,90 +88,71 @@ export function CotizacionesPage() {
       )}
 
       {!showForm && (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 p-6">
-            <h3 className="text-lg font-semibold text-[#17324c]">
-              Cotizaciones registradas
-            </h3>
+        <div className="cotizaciones-card">
+          <div style={{ marginBottom: "16px" }}>
+            <h3 className="cotizaciones-card-title">Cotizaciones registradas</h3>
           </div>
 
           {quotes.length === 0 ? (
-            <p className="p-6 text-sm text-slate-500">
+            <p style={{ fontSize: "14px", color: "#64748b", margin: 0 }}>
               No hay cotizaciones registradas.
             </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-sm">
-                <thead className="bg-slate-50">
-                  <tr className="text-left text-slate-600">
-                    <th className="px-6 py-3 font-medium">Cotización</th>
-                    <th className="px-6 py-3 font-medium">Cliente</th>
-                    <th className="px-6 py-3 font-medium">Fecha</th>
-                    <th className="px-6 py-3 font-medium">Total</th>
-                    <th className="px-6 py-3 font-medium">Estado</th>
-                    <th className="px-6 py-3 font-medium">Acción</th>
+            <div className="cotizaciones-table-wrapper">
+              <table className="cotizaciones-table">
+                <thead>
+                  <tr>
+                    <th>Cotización</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {quotes.map((quote) => (
-                    <tr
-                      key={quote.id}
-                      className="border-t border-slate-200"
-                    >
-                      <td className="px-6 py-4 font-medium text-slate-700">
-                        {quote.number}
-                      </td>
-
-                      <td className="px-6 py-4 text-slate-600">
-                        {quote.client.name}
-                      </td>
-
-                      <td className="px-6 py-4 text-slate-500">
-                        {quote.date}
-                      </td>
-
-                      <td className="px-6 py-4 font-medium text-slate-700">
+                    <tr key={quote.id}>
+                      <td style={{ fontWeight: 500 }}>{quote.number}</td>
+                      <td>{quote.client.name}</td>
+                      <td style={{ color: "#64748b" }}>{quote.date}</td>
+                      <td style={{ fontWeight: 500 }}>
                         S/ {quote.total.toFixed(2)}
                       </td>
-
-                      <td className="px-6 py-4">
+                      <td>
                         <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                          className={`badge-estado ${
                             quote.status === "Aceptada"
-                              ? "bg-emerald-100 text-emerald-700"
+                              ? "badge-aceptada"
                               : quote.status === "Convertida"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-amber-100 text-amber-700"
+                              ? "badge-convertida"
+                              : "badge-pendiente"
                           }`}
                         >
                           {quote.status}
                         </span>
                       </td>
-
-                      <td className="px-6 py-4">
+                      <td>
                         {quote.status === "Pendiente" ? (
                           <button
                             type="button"
-                            onClick={() =>
-                              handleAcceptQuote(quote.id)
-                            }
-                            className="rounded-lg border border-emerald-300 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                            onClick={() => handleAcceptQuote(quote.id)}
+                            className="cotizaciones-btn-secondary"
+                            style={{ padding: "6px 12px", fontSize: "12px", color: "#047857", borderColor: "#a7f3d0" }}
                           >
                             Aceptar
                           </button>
                         ) : quote.status === "Aceptada" ? (
                           <button
                             type="button"
-                            onClick={() =>
-                              handleConvertToSale(quote)
-                            }
-                            className="rounded-lg bg-[#17324c] px-3 py-2 text-xs font-medium text-white hover:bg-[#234968]"
+                            onClick={() => handleConvertToSale(quote)}
+                            className="cotizaciones-btn-primary"
+                            style={{ padding: "6px 12px", fontSize: "12px" }}
                           >
                             Convertir en venta
                           </button>
                         ) : (
-                          <span className="text-xs font-medium text-slate-500">
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>
                             Venta generada
                           </span>
                         )}
