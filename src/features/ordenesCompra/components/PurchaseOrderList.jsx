@@ -93,22 +93,26 @@ export function PurchaseOrderList({
                         className={`ordenes-status-select ${
                           order.status === "Pendiente"
                             ? "badge-orden-pendiente"
-                            : order.status === "Enviada"
+                            : order.status === "En compra" ||
+                              order.status === "En tránsito"
                             ? "badge-orden-enviada"
-                            : order.status === "Recibida"
+                            : order.status === "Recibido" ||
+                              order.status === "Cerrado"
                             ? "badge-orden-recibida"
                             : "badge-orden-cancelada"
                         }`}
                       >
                         <option value="Pendiente">Pendiente</option>
-                        <option value="Enviada">Enviada</option>
-                        <option value="Recibida">Recibida</option>
-                        <option value="Cancelada">Cancelada</option>
+                        <option value="En compra">En compra</option>
+                        <option value="En tránsito">En tránsito</option>
+                        <option value="Recibido">Recibido</option>
+                        <option value="Cerrado">Cerrado</option>
                       </select>
                     </td>
 
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      {order.status === "Recibida" &&
+                      {(order.status === "Recibido" ||
+                        order.status === "Cerrado") &&
                       !order.receiptRegistered ? (
                         <button
                           type="button"

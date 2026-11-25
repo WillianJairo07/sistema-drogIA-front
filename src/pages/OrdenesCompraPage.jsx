@@ -1,59 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useOutletContext } from "react-router-dom";
 
 import { PurchaseOrderForm } from "../features/ordenesCompra/components/PurchaseOrderForm";
 import { PurchaseOrderList } from "../features/ordenesCompra/components/PurchaseOrderList";
+import { listarProveedores } from "../features/proveedores/services/proveedorService";
+import { listarProductos } from "../features/productos/services/productoService";
 import "../styles/ordenesCompra.css";
-
-const initialSuppliers = [
-  {
-    id: 1,
-    name: "Laboratorios del Sur S.A.C.",
-    document: "20123456789",
-  },
-  {
-    id: 2,
-    name: "Distribuidora Médica Perú S.A.C.",
-    document: "20456789123",
-  },
-  {
-    id: 3,
-    name: "Productos Farmacéuticos Andinos",
-    document: "20678912345",
-  },
-];
-
-const initialProducts = [
-  {
-    id: 1,
-    name: "Paracetamol 500 mg",
-    unit: "CAJA",
-    price: 5,
-  },
-  {
-    id: 2,
-    name: "Alcohol 70%",
-    unit: "FRASCO",
-    price: 8,
-  },
-  {
-    id: 3,
-    name: "Ibuprofeno 400 mg",
-    unit: "CAJA",
-    price: 7.5,
-  },
-];
 
 export function OrdenesCompraPage() {
   const location = useLocation();
 
   const {
-    purchaseOrders,
+    purchaseOrders = [],
     onCreatePurchaseOrder,
     onPurchaseOrderStatusChange,
     onRegisterPurchaseReceipt,
   } = useOutletContext();
 
+  const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(
     Boolean(location.state?.request)
   );
@@ -62,10 +27,23 @@ export function OrdenesCompraPage() {
     location.state?.request || null
   );
 
-  const handleCreateOrder = (order) => {
-    onCreatePurchaseOrder(order);
-    setShowForm(false);
-    setSelectedRequest(null);
+  useEffect(() => {
+    listarProveedores()
+      .then(setSuppliers)
+      .catch((error) => alert(error.message));
+    listarProductos()
+      .then(setProducts)
+      .catch((error) => alert(error.message));
+  }, []);
+
+  const handleCreateOrder = async (order) => {
+    try {
+      await onCreatePurchaseOrder(order);
+      setShowForm(false);
+      setSelectedRequest(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleNewOrder = () => {
@@ -104,8 +82,8 @@ export function OrdenesCompraPage() {
 
       {showForm ? (
         <PurchaseOrderForm
-          suppliers={initialSuppliers}
-          products={initialProducts}
+          suppliers={suppliers}
+          products={products}
           request={selectedRequest}
           onSave={handleCreateOrder}
           onCancel={() => {

@@ -25,6 +25,7 @@ export function ClientForm({ client, onSave, onCancel }) {
     }
 
     onSave({
+      ...client,
       id: client?.id || Date.now(),
       name: name.trim(),
       document: document.trim(),

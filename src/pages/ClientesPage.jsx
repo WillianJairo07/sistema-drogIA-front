@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ClientForm } from "../features/clientes/components/ClientForm";
 import { ClientList } from "../features/clientes/components/ClientList";
+import {
+  actualizarCliente,
+  crearCliente,
+  eliminarCliente,
+  listarClientes,
+} from "../features/clientes/services/clienteService";
 import "../styles/clientes.css";
 
-const initialClients = [
-  { id: 1, name: "Rodríguez S.A.C.", document: "20123456789" },
-  { id: 2, name: "Distribuidora Salud Perú", document: "20456789123" },
-  { id: 3, name: "Farmacias del Sur", document: "20678912345" },
-];
-
 export function ClientesPage() {
-  const [clients, setClients] = useState(initialClients);
+  const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+
+  useEffect(() => {
+    listarClientes()
+      .then(setClients)
+      .catch((error) => alert(error.message));
+  }, []);
 
   const filteredClients = clients.filter((client) => {
     const value = search.toLowerCase();
@@ -23,19 +29,27 @@ export function ClientesPage() {
     );
   });
 
-  const handleSave = (client) => {
-    setClients((currentClients) => {
-      const exists = currentClients.some((item) => item.id === client.id);
-      if (exists) {
-        return currentClients.map((item) =>
-          item.id === client.id ? client : item
-        );
-      }
-      return [...currentClients, client];
-    });
+  const handleSave = async (client) => {
+    try {
+      const guardado = editingClient
+        ? await actualizarCliente(editingClient.id, client)
+        : await crearCliente(client);
 
-    setShowForm(false);
-    setEditingClient(null);
+      setClients((currentClients) => {
+        const exists = currentClients.some((item) => item.id === guardado.id);
+        if (exists) {
+          return currentClients.map((item) =>
+            item.id === guardado.id ? guardado : item
+          );
+        }
+        return [...currentClients, guardado];
+      });
+
+      setShowForm(false);
+      setEditingClient(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleEdit = (client) => {
@@ -43,10 +57,15 @@ export function ClientesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (clientId) => {
-    setClients((currentClients) =>
-      currentClients.filter((client) => client.id !== clientId)
-    );
+  const handleDelete = async (clientId) => {
+    try {
+      await eliminarCliente(clientId);
+      setClients((currentClients) =>
+        currentClients.filter((client) => client.id !== clientId)
+      );
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleNewClient = () => {

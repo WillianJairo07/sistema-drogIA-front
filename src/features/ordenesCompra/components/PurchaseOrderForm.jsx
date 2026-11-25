@@ -147,7 +147,7 @@ export function PurchaseOrderForm({
       id: Date.now(),
       number: `OC-${Date.now().toString().slice(-6)}`,
       supplier,
-      date: new Date().toLocaleDateString("es-PE"),
+      date: new Date().toISOString().slice(0, 10),
       items: normalizedItems,
       subtotal,
       igv,

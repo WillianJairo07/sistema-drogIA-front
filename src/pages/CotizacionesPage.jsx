@@ -1,6 +1,26 @@
-import { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useOutletContext } from "react-router-dom";
 import { CotizacionForm } from "../features/cotizaciones/components/CotizacionForm";
+import {
+  actualizarCotizacion,
+  cambiarEstadoCotizacion,
+  crearCotizacion,
+  guardarProveedores,
+  listarCotizaciones,
+  listarProveedores,
+  enviarCotizacion,
+  mapClienteCotizacion,
+  productosDesdeCaso,
+} from "../features/cotizaciones/services/cotizacionService";
+import {
+  listarCasos,
+  obtenerCaso,
+  tomarCaso,
+} from "../features/casos/services/casoService";
+import { convertirCotizacionEnVenta } from "../features/ventas/services/ventaService";
+import { firstDefined, toIsoDate } from "../services/mappers";
+import { useAuth } from "../context/AuthContext";
+import { normalizeRole } from "../features/auth/services/authService";
 import {
   calcularMontosCotizacion,
   descargarPdfCotizacion,
@@ -10,12 +30,17 @@ import "../styles/cotizaciones.css";
 
 export function CotizacionesPage() {
   const { onCreateSale } = useOutletContext();
+  const { user } = useAuth();
+  const puedeGestionar = normalizeRole(user?.role) === "Vendedor";
+  const location = useLocation();
+  const correo = location.state?.correo;
 
   const [showForm, setShowForm] = useState(false);
   const [editingQuote, setEditingQuote] = useState(null);
   const [quotes, setQuotes] = useState([]);
   const [message, setMessage] = useState("");
   const [selectedQuote, setSelectedQuote] = useState(null);
+  const [casoActivo, setCasoActivo] = useState(null);
 
   const [emailModalQuote, setEmailModalQuote] = useState(null);
   const [destinatario, setDestinatario] = useState("");
@@ -23,27 +48,113 @@ export function CotizacionesPage() {
   const [cuerpoCorreo, setCuerpoCorreo] = useState("");
   const [enviandoCorreo, setEnviandoCorreo] = useState(false);
 
-  const handleSaveQuote = (quote) => {
-    const montos = calcularMontosCotizacion(quote);
-    const guardada = {
-      ...quote,
-      ...montos,
-      status: quote.status || "Pendiente",
-    };
+  useEffect(() => {
+    const cargar = async () => {
+      setMessage("");
+      try {
+        setQuotes(await listarCotizaciones());
 
-    setQuotes((currentQuotes) => {
-      const existe = currentQuotes.some((item) => item.id === guardada.id);
-      if (existe) {
-        return currentQuotes.map((item) =>
-          item.id === guardada.id ? guardada : item
-        );
+        if (!puedeGestionar) {
+          setCasoActivo(null);
+          return;
+        }
+
+        const nombreUsuario = String(
+          user?.name || user?.username || ""
+        ).trim().toLowerCase();
+        const esDelUsuario = (caso) =>
+          Boolean(caso) &&
+          ((caso.asignadoANombre &&
+            String(caso.asignadoANombre).trim().toLowerCase() === nombreUsuario) ||
+            (!caso.asignadoANombre && Boolean(caso.asignadoAId)));
+
+        let caso = null;
+        if (location.state?.casoId) {
+          caso = await obtenerCaso(location.state.casoId);
+          if (!esDelUsuario(caso)) {
+            caso = await tomarCaso(caso.id);
+          }
+        } else {
+          const casos = await listarCasos();
+          const idCaso = location.state?.correo?.caseId ?? location.state?.correo?.casoId;
+          caso =
+            (idCaso ? casos.find((item) => item.id === idCaso) : null) ||
+            (correo?.id
+              ? casos.find((item) => item.correoId === correo.id)
+              : null) ||
+            casos.find(esDelUsuario);
+          if (!esDelUsuario(caso)) {
+            caso = null;
+          }
+        }
+
+        setCasoActivo(caso);
+        if (!caso && !editingQuote) {
+          setMessage("Debe tomar un caso antes de crear una cotización.");
+        }
+      } catch (error) {
+        setMessage(error.message);
+        setCasoActivo(null);
       }
-      return [...currentQuotes, guardada];
-    });
+    };
+    cargar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, user?.name]);
 
-    setShowForm(false);
-    setEditingQuote(null);
-    setSelectedQuote(guardada);
+  const datosIniciales = casoActivo
+    ? {
+        casoId: casoActivo.id,
+        client: mapClienteCotizacion(
+          firstDefined(casoActivo.cliente, correo?.cliente),
+          typeof firstDefined(casoActivo.cliente, correo?.cliente) === "string"
+            ? firstDefined(casoActivo.cliente, correo?.cliente)
+            : ""
+        ),
+        date:
+          toIsoDate(
+            firstDefined(casoActivo.fechaCreacion, correo?.date)
+          ) || new Date().toISOString().slice(0, 10),
+        products: productosDesdeCaso(
+          firstDefined(casoActivo.productos, correo?.productos)
+        ),
+        destino: casoActivo.destino ?? correo?.destino ?? null,
+        proveedores: [],
+      }
+    : null;
+
+  const handleSaveQuote = async (quote) => {
+    const casoId = quote.casoId ?? casoActivo?.id;
+    if (!casoId) {
+      setMessage("Debe tomar un caso antes de crear una cotización.");
+      return;
+    }
+
+    try {
+      const esEdicion = quotes.some((item) => item.id === quote.id);
+      const guardada = esEdicion
+        ? await actualizarCotizacion(quote.id, quote)
+        : await crearCotizacion({ ...quote, casoId }, casoId);
+
+      if (!esEdicion && quote.proveedores?.length) {
+        await guardarProveedores(guardada.id, quote.proveedores);
+      }
+
+      setQuotes((currentQuotes) => {
+        const existe = currentQuotes.some((item) => item.id === guardada.id);
+        if (existe) {
+          return currentQuotes.map((item) =>
+            item.id === guardada.id ? guardada : item
+          );
+        }
+        return [...currentQuotes, guardada];
+      });
+
+      setShowForm(false);
+      setEditingQuote(null);
+      setSelectedQuote(guardada);
+    } catch (error) {
+      setMessage(error.message);
+    }
   };
 
   const handleOpenEdit = (quote) => {
@@ -54,6 +165,16 @@ export function CotizacionesPage() {
   const handleCancelForm = () => {
     setShowForm(false);
     setEditingQuote(null);
+  };
+
+  const handleVerDetalle = async (quote) => {
+    setSelectedQuote(quote);
+    try {
+      const proveedores = await listarProveedores(quote.id);
+      setSelectedQuote({ ...quote, proveedores });
+    } catch {
+      // El detalle sigue disponible aunque no se puedan consultar los proveedores.
+    }
   };
 
   const handleGenerarPdf = (quote) => {
@@ -79,31 +200,28 @@ export function CotizacionesPage() {
     const pdfFileName = `${emailModalQuote.number || "cotizacion"}.pdf`;
 
     try {
-      const resp = await fetch(
-        `/api/cotizaciones/${emailModalQuote.id}/enviar-correo`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: destinatario.trim(),
-            subject: asuntoCorreo,
-            body: cuerpoCorreo,
-            pdfFileName,
-            pdfBase64,
-            quote: emailModalQuote,
-          }),
-        }
+      await enviarCotizacion(emailModalQuote.id, {
+        to: destinatario.trim(),
+        subject: asuntoCorreo,
+        body: cuerpoCorreo,
+        pdfFileName,
+        pdfBase64,
+        quote: emailModalQuote,
+      });
+
+      setQuotes((currentQuotes) =>
+        currentQuotes.map((quote) =>
+          quote.id === emailModalQuote.id ? { ...quote, status: "Enviada" } : quote
+        )
       );
-
-      if (!resp.ok) {
-        throw new Error("Endpoint no disponible");
-      }
-
+      setSelectedQuote((current) =>
+        current?.id === emailModalQuote.id ? { ...current, status: "Enviada" } : current
+      );
       setMessage(
         `Cotización ${emailModalQuote.number} enviada con el PDF (${pdfFileName}) a ${destinatario.trim()}.`
       );
       setEmailModalQuote(null);
-    } catch {
+    } catch (error) {
       descargarPdfCotizacion(emailModalQuote);
       const mailto = `mailto:${encodeURIComponent(
         destinatario.trim()
@@ -112,7 +230,7 @@ export function CotizacionesPage() {
       )}`;
       window.location.href = mailto;
       setMessage(
-        `Se descargó ${pdfFileName} y se abrió tu correo para enviarlo a ${destinatario.trim()}.`
+        `${error.message} Se descargó ${pdfFileName} y se abrió tu correo para enviarlo a ${destinatario.trim()}.`
       );
       setEmailModalQuote(null);
     } finally {
@@ -120,44 +238,39 @@ export function CotizacionesPage() {
     }
   };
 
-  const handleAcceptQuote = (quoteId) => {
-    setQuotes((currentQuotes) =>
-      currentQuotes.map((quote) =>
-        quote.id === quoteId ? { ...quote, status: "Aceptada" } : quote
-      )
-    );
+  const handleAcceptQuote = async (quoteId) => {
+    try {
+      const actualizada = await cambiarEstadoCotizacion(quoteId, "Aceptada");
+      setQuotes((currentQuotes) =>
+        currentQuotes.map((quote) =>
+          quote.id === quoteId ? actualizada : quote
+        )
+      );
+    } catch (error) {
+      setMessage(error.message);
+    }
   };
 
-  const handleConvertToSale = (quote) => {
-    const { total } = calcularMontosCotizacion(quote);
-    const sale = {
-      id: Date.now(),
-      number: `VEN-${String(Date.now()).slice(-4)}`,
-      quoteNumber: quote.number,
-      client: quote.client,
-      date: quote.date,
-      items: quote.products.map((product) => ({
-        product,
-        quantity: product.quantity,
-        price: product.price,
-      })),
-      total,
-      status: "Pendiente de compra",
-    };
-
-    onCreateSale(sale);
-
-    setQuotes((currentQuotes) =>
-      currentQuotes.map((currentQuote) =>
-        currentQuote.id === quote.id
-          ? { ...currentQuote, status: "Convertida" }
-          : currentQuote
-      )
-    );
-
-    setMessage(
-      `La cotización ${quote.number} fue convertida en venta correctamente.`
-    );
+  const handleConvertToSale = async (quote) => {
+    try {
+      const venta = await convertirCotizacionEnVenta(quote.id);
+      if (onCreateSale) {
+        await onCreateSale(venta);
+      }
+      setQuotes((currentQuotes) =>
+        currentQuotes.map((currentQuote) =>
+          currentQuote.id === quote.id
+            ? { ...currentQuote, status: "Convertida" }
+            : currentQuote
+        )
+      );
+      setSelectedQuote(null);
+      setMessage(
+        `La cotización ${quote.number} fue convertida en venta correctamente.`
+      );
+    } catch (error) {
+      setMessage(error.message);
+    }
   };
 
   const detalleMontos = calcularMontosCotizacion(selectedQuote);
@@ -173,7 +286,7 @@ export function CotizacionesPage() {
 
       {message && <div className="cotizaciones-alert">{message}</div>}
 
-      {!showForm && (
+      {!showForm && puedeGestionar && (
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <button
             type="button"
@@ -195,7 +308,7 @@ export function CotizacionesPage() {
 
       {showForm && (
         <CotizacionForm
-          initialQuote={editingQuote}
+          initialQuote={editingQuote || datosIniciales}
           onCancel={handleCancelForm}
           onGenerate={handleSaveQuote}
         />
@@ -252,14 +365,14 @@ export function CotizacionesPage() {
                           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                             <button
                               type="button"
-                              onClick={() => setSelectedQuote(quote)}
+                              onClick={() => handleVerDetalle(quote)}
                               className="cotizaciones-btn-secondary"
                               style={{ padding: "6px 12px", fontSize: "12px" }}
                             >
                               Ver detalle
                             </button>
 
-                            {quote.status !== "Convertida" && (
+                            {puedeGestionar && quote.status !== "Convertida" && (
                               <button
                                 type="button"
                                 onClick={() => handleOpenEdit(quote)}
@@ -270,7 +383,11 @@ export function CotizacionesPage() {
                               </button>
                             )}
 
-                            {quote.status === "Pendiente" ? (
+                            {!puedeGestionar ? (
+                              <span style={{ fontSize: "12px", color: "#64748b" }}>
+                                Solo lectura
+                              </span>
+                            ) : quote.status === "Pendiente" ? (
                               <button
                                 type="button"
                                 onClick={() => handleAcceptQuote(quote.id)}
@@ -279,7 +396,7 @@ export function CotizacionesPage() {
                               >
                                 Aceptar
                               </button>
-                            ) : quote.status === "Aceptada" ? (
+                            ) : quote.status === "Aceptada" || quote.status === "Enviada" ? (
                               <button
                                 type="button"
                                 onClick={() => handleConvertToSale(quote)}
@@ -409,13 +526,15 @@ export function CotizacionesPage() {
                 >
                   Generar PDF
                 </button>
-                <button
-                  type="button"
-                  onClick={() => abrirModalCorreo(selectedQuote)}
-                  className="cotizaciones-btn-primary"
-                >
-                  Enviar por correo
-                </button>
+                {puedeGestionar && (
+                  <button
+                    type="button"
+                    onClick={() => abrirModalCorreo(selectedQuote)}
+                    className="cotizaciones-btn-primary"
+                  >
+                    Enviar por correo
+                  </button>
+                )}
               </div>
 
               <button

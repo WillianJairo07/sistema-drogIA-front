@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+import { normalizeRole } from "../../auth/services/authService";
 import {
   actualizarEstadoCorreo,
   clasificarCorreo,
   ejecutarIngesta,
-  listarCarpetas,
-  listarCorreos,
   listarHistorial,
+  obtenerCorreo,
 } from "../services/correoService";
 
 export function EmailAnalysisPanel() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const puedeCotizar = normalizeRole(user?.role) === "Vendedor";
   const [emails, setEmails] = useState([]);
-  const [carpetas, setCarpetas] = useState([]);
-  const [carpeta, setCarpeta] = useState("INBOX");
+  const [carpeta, setCarpeta] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const [procesandoId, setProcesandoId] = useState(null);
   const [error, setError] = useState("");
@@ -34,23 +36,13 @@ export function EmailAnalysisPanel() {
 
   useEffect(() => {
     cargarHistorial();
-    listarCarpetas()
-      .then(setCarpetas)
-      .catch(() => setError("No se pudieron cargar las carpetas."));
   }, []);
 
-  const cargarCarpeta = async (nombre) => {
-    setCarpeta(nombre);
-    setLoading(true);
-    setError("");
-    try {
-      setEmails(await listarCorreos(nombre, 20));
-    } catch {
-      setError("No se pudieron cargar los correos de la carpeta.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const areas = [...new Set(emails.map((email) => email.area).filter(Boolean))];
+  const correosVisibles =
+    carpeta === "Todos"
+      ? emails
+      : emails.filter((email) => email.area === carpeta);
 
   const handleAnalyze = async (id) => {
     setProcesandoId(id);
@@ -109,10 +101,23 @@ export function EmailAnalysisPanel() {
     }
   };
 
+  const handleVerDetalle = async (email) => {
+    setProcesandoId(email.id);
+    setError("");
+    try {
+      setCorreoSeleccionado(await obtenerCorreo(email.id));
+    } catch {
+      setCorreoSeleccionado(email);
+      setError("No se pudo cargar el detalle completo del correo.");
+    } finally {
+      setProcesandoId(null);
+    }
+  };
+
   const handleCotizar = (email) => {
     setCorreoSeleccionado(null);
     navigate("/dashboard/cotizaciones", {
-      state: { correo: email },
+      state: { casoId: email.caseId ?? null, correo: email },
     });
   };
 
@@ -144,22 +149,20 @@ export function EmailAnalysisPanel() {
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginTop: "12px" }}>
           <select
             value={carpeta}
-            onChange={(event) => cargarCarpeta(event.target.value)}
+            onChange={(event) => setCarpeta(event.target.value)}
             style={{ padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", color: "#17324c" }}
           >
-            <option value="INBOX">INBOX</option>
-            {carpetas
-              .filter((nombre) => nombre !== "INBOX")
-              .map((nombre) => (
-                <option key={nombre} value={nombre}>
-                  {nombre}
-                </option>
-              ))}
+            <option value="Todos">Todos</option>
+            {areas.map((nombre) => (
+              <option key={nombre} value={nombre}>
+                {nombre}
+              </option>
+            ))}
           </select>
 
           <button
             type="button"
-            onClick={() => cargarCarpeta(carpeta)}
+            onClick={cargarHistorial}
             className="correos-btn-primary"
           >
             Actualizar
@@ -192,8 +195,8 @@ export function EmailAnalysisPanel() {
           </thead>
 
           <tbody>
-            {emails.length > 0 ? (
-              emails.map((email) => (
+            {correosVisibles.length > 0 ? (
+              correosVisibles.map((email) => (
                 <tr key={email.id}>
                   <td>
                     <div className="correos-truncate-sender" title={email.sender}>
@@ -241,7 +244,7 @@ export function EmailAnalysisPanel() {
                       </button>
                     )}
 
-                    {email.status === "Analizado" && (
+                    {email.status === "Analizado" && puedeCotizar && (
                       <button
                         type="button"
                         onClick={() => handleCotizar(email)}
@@ -254,7 +257,7 @@ export function EmailAnalysisPanel() {
                     {email.status === "Revisión manual" && (
                       <button
                         type="button"
-                        onClick={() => setCorreoSeleccionado(email)}
+                        onClick={() => handleVerDetalle(email)}
                         style={{
                           padding: "6px 10px",
                           border: "1px solid #cbd5e1",
@@ -419,13 +422,15 @@ export function EmailAnalysisPanel() {
                 Marcar como Analizado
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleCotizar(correoSeleccionado)}
-                className="correos-btn-primary"
-              >
-                Cotizar
-              </button>
+              {puedeCotizar && (
+                <button
+                  type="button"
+                  onClick={() => handleCotizar(correoSeleccionado)}
+                  className="correos-btn-primary"
+                >
+                  Cotizar
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,40 +1,33 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
+import { listarVentas, crearVenta, cambiarEstadoVenta } from "../features/ventas/services/ventaService";
+import {
+  listarSolicitudes,
+  cambiarEstadoSolicitud,
+} from "../features/solicitudesCompra/services/solicitudCompraService";
+import {
+  listarOrdenes,
+  crearOrdenCompra,
+  cambiarEstadoOrden,
+  registrarRecepcionOrden,
+} from "../features/ordenesCompra/services/ordenCompraService";
+import {
+  listarInventario,
+  crearInventario,
+  actualizarInventario,
+} from "../features/inventario/services/inventarioService";
+import { listarDespachos, crearDespacho } from "../features/despachos/services/despachoService";
+import {
+  listarPedidos,
+  marcarPedidoTomado,
+  verificarPedido,
+  cambiarEstadoPedido,
+} from "../features/pedidosAlmacen/services/pedidoAlmacenService";
 import "../styles/dashboard.css";
-
-const initialInventory = [
-  {
-    id: 1,
-    product: "Paracetamol 500 mg",
-    purchaseOrderCode: "OC-000101",
-    lot: "LOT-PAR-001",
-    stock: 120,
-    minimumStock: 30,
-    expiration: "2027-08-15",
-  },
-  {
-    id: 2,
-    product: "Alcohol 70%",
-    purchaseOrderCode: "OC-000102",
-    lot: "LOT-ALC-002",
-    stock: 80,
-    minimumStock: 20,
-    expiration: "2027-05-20",
-  },
-  {
-    id: 3,
-    product: "Ibuprofeno 400 mg",
-    purchaseOrderCode: "OC-000103",
-    lot: "LOT-IBU-003",
-    stock: 45,
-    minimumStock: 15,
-    expiration: "2026-12-10",
-  },
-];
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -42,8 +35,24 @@ export default function DashboardLayout() {
   const [sales, setSales] = useState([]);
   const [purchaseRequests, setPurchaseRequests] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
-  const [inventory, setInventory] = useState(initialInventory);
+  const [inventory, setInventory] = useState([]);
   const [dispatches, setDispatches] = useState([]);
+  const [pedidos, setPedidos] = useState([]);
+
+  const recargar = useCallback(async () => {
+    await Promise.all([
+      listarVentas().then(setSales).catch(() => setSales([])),
+      listarSolicitudes().then(setPurchaseRequests).catch(() => setPurchaseRequests([])),
+      listarOrdenes().then(setPurchaseOrders).catch(() => setPurchaseOrders([])),
+      listarInventario().then(setInventory).catch(() => setInventory([])),
+      listarDespachos().then(setDispatches).catch(() => setDispatches([])),
+      listarPedidos().then(setPedidos).catch(() => setPedidos([])),
+    ]);
+  }, []);
+
+  useEffect(() => {
+    recargar();
+  }, [recargar]);
 
   const toggleSidebar = () => {
     setSidebarOpen((current) => !current);
@@ -53,169 +62,120 @@ export default function DashboardLayout() {
     setSidebarOpen(false);
   };
 
-  const handleCreateSale = (sale) => {
-    setSales((currentSales) => [
-      ...currentSales,
-      {
-        ...sale,
-        status: "En proceso",
-      },
-    ]);
-
-    const requests = sale.items.map((item) => ({
-      id: `${sale.id}-${item.product.id}`,
-      saleId: sale.id,
-      saleNumber: sale.number,
-      productId: item.product.id,
-      product: item.product.name,
-      quantity: item.quantity,
-      status: "Pendiente de compra",
-    }));
-
-    setPurchaseRequests((currentRequests) => [
-      ...currentRequests,
-      ...requests,
-    ]);
-  };
-
-  const handleSaleStatusChange = (saleId, status) => {
-    setSales((currentSales) =>
-      currentSales.map((sale) =>
-        sale.id === saleId ? { ...sale, status } : sale
-      )
-    );
-  };
-
-  const handlePurchaseRequestStatusChange = (requestId, status) => {
-    setPurchaseRequests((currentRequests) =>
-      currentRequests.map((request) =>
-        request.id === requestId ? { ...request, status } : request
-      )
-    );
-  };
-
-  const handleCreatePurchaseOrder = (order) => {
-    setPurchaseOrders((currentOrders) => [
-      ...currentOrders,
-      {
-        ...order,
-        receiptRegistered: false,
-      },
-    ]);
-
-    order.requestIds?.forEach((requestId) => {
-      const request = purchaseRequests.find(
-        (item) => item.id === requestId
-      );
-
-      handlePurchaseRequestStatusChange(requestId, "En compra");
-
-      if (request) {
-        handleSaleStatusChange(request.saleId, "En proceso");
+  const handleCreateSale = async (sale) => {
+    try {
+      const yaExiste = sales.some((item) => item.id === sale.id);
+      if (!yaExiste && !sale.cotizacionId) {
+        await crearVenta(sale);
       }
-    });
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handlePurchaseOrderStatusChange = (orderId, status) => {
-    setPurchaseOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === orderId ? { ...order, status } : order
-      )
-    );
+  const handleSaleStatusChange = async (saleId, status) => {
+    try {
+      await cambiarEstadoVenta(saleId, status);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handleRegisterPurchaseReceipt = (orderId) => {
+  const handlePurchaseRequestStatusChange = async (requestId, status) => {
+    try {
+      await cambiarEstadoSolicitud(requestId, status);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleCreatePurchaseOrder = async (order) => {
+    try {
+      await crearOrdenCompra(order);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handlePurchaseOrderStatusChange = async (orderId, status) => {
+    try {
+      await cambiarEstadoOrden(orderId, status);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleRegisterPurchaseReceipt = async (orderId) => {
     const order = purchaseOrders.find((item) => item.id === orderId);
-
     if (!order || order.receiptRegistered) {
       return;
     }
 
-    setInventory((currentInventory) => {
-      const updated = currentInventory.map((inventoryItem) => {
-        const receivedItem = order.items.find(
-          (item) => item.productId === inventoryItem.id
-        );
-
-        if (!receivedItem) {
-          return inventoryItem;
-        }
-
-        return {
-          ...inventoryItem,
-          purchaseOrderCode: order.number || inventoryItem.purchaseOrderCode,
-          stock: inventoryItem.stock + receivedItem.quantity,
-        };
-      });
-
-      order.items.forEach((receivedItem) => {
-        const exists = updated.some(
-          (inv) => inv.product.toLowerCase() === receivedItem.product.toLowerCase()
-        );
-        if (!exists) {
-          updated.push({
-            id: Date.now() + receivedItem.productId,
-            product: receivedItem.product,
-            purchaseOrderCode: order.number,
-            lot: `LOT-${String(Date.now()).slice(-4)}`,
-            stock: receivedItem.quantity,
-            minimumStock: 10,
-            expiration: "2027-12-31",
-          });
-        }
-      });
-
-      return updated;
-    });
-
-    setPurchaseOrders((currentOrders) =>
-      currentOrders.map((item) =>
-        item.id === orderId
-          ? {
-              ...item,
-              receiptRegistered: true,
-            }
-          : item
-      )
-    );
-
-    order.requestIds?.forEach((requestId) => {
-      const request = purchaseRequests.find(
-        (item) => item.id === requestId
-      );
-
-      handlePurchaseRequestStatusChange(requestId, "Recibido");
-
-      if (request) {
-        handleSaleStatusChange(request.saleId, "Disponible");
-      }
-    });
+    try {
+      await registrarRecepcionOrden(orderId);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handleAddInventoryItem = (newItem) => {
-    setInventory((current) => [
-      ...current,
-      {
-        ...newItem,
-        id: newItem.id ?? Date.now(),
-      },
-    ]);
+  const handleAddInventoryItem = async (newItem) => {
+    try {
+      await crearInventario(newItem);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handleUpdateInventoryItem = (updatedItem) => {
-    setInventory((current) =>
-      current.map((item) => (item.id === updatedItem.id ? updatedItem : item))
-    );
+  const handleUpdateInventoryItem = async (updatedItem) => {
+    try {
+      await actualizarInventario(updatedItem.id, updatedItem);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-  const handleCreateDispatch = (dispatchRecord) => {
-    setDispatches((current) => [
-      ...current,
-      {
-        ...dispatchRecord,
-        id: dispatchRecord.id ?? Date.now(),
-      },
-    ]);
+  const handleCreateDispatch = async (dispatchRecord) => {
+    try {
+      await crearDespacho(dispatchRecord);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleTomarPedido = async (pedidoId) => {
+    try {
+      await marcarPedidoTomado(pedidoId);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleVerificarPedido = async (pedidoId, verificadoInfo, verificadoLotes) => {
+    try {
+      await verificarPedido(pedidoId, verificadoInfo, verificadoLotes);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handlePedidoStatusChange = async (pedidoId, estado) => {
+    try {
+      await cambiarEstadoPedido(pedidoId, estado);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -265,6 +225,11 @@ export default function DashboardLayout() {
 
                 dispatches,
                 onCreateDispatch: handleCreateDispatch,
+
+                pedidos,
+                onTomarPedido: handleTomarPedido,
+                onVerificarPedido: handleVerificarPedido,
+                onPedidoStatusChange: handlePedidoStatusChange,
               }}
             />
           </div>

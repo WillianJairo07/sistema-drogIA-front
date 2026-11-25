@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProductForm } from "../features/productos/components/ProductForm";
 import { ProductList } from "../features/productos/components/ProductList";
+import {
+  actualizarProducto,
+  crearProducto,
+  eliminarProducto,
+  listarProductos,
+} from "../features/productos/services/productoService";
 import "../styles/productos.css";
 
-const initialProducts = [
-  { id: 1, name: "Paracetamol 500 mg", healthRegistration: "RSA-12345", price: 5.0 },
-  { id: 2, name: "Alcohol 70%", healthRegistration: "RSA-23456", price: 8.0 },
-  { id: 3, name: "Ibuprofeno 400 mg", healthRegistration: "RSA-34567", price: 7.5 },
-];
-
 export function ProductosPage() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  useEffect(() => {
+    listarProductos()
+      .then(setProducts)
+      .catch((error) => alert(error.message));
+  }, []);
 
   const filteredProducts = products.filter((product) => {
     const value = search.toLowerCase();
@@ -23,19 +29,27 @@ export function ProductosPage() {
     );
   });
 
-  const handleSave = (product) => {
-    setProducts((currentProducts) => {
-      const exists = currentProducts.some((item) => item.id === product.id);
-      if (exists) {
-        return currentProducts.map((item) =>
-          item.id === product.id ? product : item
-        );
-      }
-      return [...currentProducts, product];
-    });
+  const handleSave = async (product) => {
+    try {
+      const guardado = editingProduct
+        ? await actualizarProducto(editingProduct.id, product)
+        : await crearProducto(product);
 
-    setShowForm(false);
-    setEditingProduct(null);
+      setProducts((currentProducts) => {
+        const exists = currentProducts.some((item) => item.id === guardado.id);
+        if (exists) {
+          return currentProducts.map((item) =>
+            item.id === guardado.id ? guardado : item
+          );
+        }
+        return [...currentProducts, guardado];
+      });
+
+      setShowForm(false);
+      setEditingProduct(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleEdit = (product) => {
@@ -43,10 +57,15 @@ export function ProductosPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (productId) => {
-    setProducts((currentProducts) =>
-      currentProducts.filter((product) => product.id !== productId)
-    );
+  const handleDelete = async (productId) => {
+    try {
+      await eliminarProducto(productId);
+      setProducts((currentProducts) =>
+        currentProducts.filter((product) => product.id !== productId)
+      );
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleNewProduct = () => {

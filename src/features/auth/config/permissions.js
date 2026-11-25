@@ -14,9 +14,11 @@ export const rolePermissions = {
     "/dashboard/ventas",
     "/dashboard/ventas-compras",
     "/dashboard/correos",
+    "/dashboard/productos",
+    "/dashboard/inventario",
     "/dashboard/proveedores",
     "/dashboard/ordenes-compra",
-    "/dashboard/plazos",
+    "/dashboard/despacho",
   ],
 
   [roles.VENDEDOR]: [
@@ -34,7 +36,6 @@ export const rolePermissions = {
     "/dashboard/correos",
     "/dashboard/proveedores",
     "/dashboard/ordenes-compra",
-    "/dashboard/plazos",
   ],
 
   [roles.ALMACENERO]: [
@@ -46,6 +47,15 @@ export const rolePermissions = {
   ],
 };
 
+const ROLE_ALIASES = {
+  ADMINISTRACION: roles.ADMINISTRADOR,
+  VENTAS: roles.VENDEDOR,
+  COMPRAS: roles.COMPRADOR,
+  ALMACEN: roles.ALMACENERO,
+};
+
 export function hasPermission(role, path) {
-  return rolePermissions[role]?.includes(path);
+  const normalized =
+    ROLE_ALIASES[String(role || "").trim().toUpperCase()] || role;
+  return rolePermissions[normalized]?.includes(path);
 }

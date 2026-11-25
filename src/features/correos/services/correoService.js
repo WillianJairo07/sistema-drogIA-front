@@ -1,38 +1,44 @@
-import axios from "axios";
-import { API_BASE_URL, getToken } from "../../../services/apiConfig";
+import { apiGet, apiPatch, apiPost } from "../../../services/apiConfig";
+import { firstDefined, normalizeEntity } from "../../../services/mappers";
 
-function http() {
-  const token = getToken();
-
-  return axios.create({
-    baseURL: `${API_BASE_URL}/correos`,
-    headers: {
-      Accept: "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  });
+/** Adapta CorreoResponse al modelo usado por EmailAnalysisPanel. */
+export function mapCorreo(data = {}) {
+  return {
+    ...data,
+    id: data.id ?? data.correoId ?? null,
+    caseId: data.casoId ?? data.caseId ?? null,
+    sender: firstDefined(data.sender, data.remitente, ""),
+    subject: firstDefined(data.subject, data.asunto, ""),
+    date: firstDefined(data.date, data.fecha, ""),
+    area: firstDefined(data.area, ""),
+    status: firstDefined(data.status, data.estado, "Pendiente"),
+    cliente: normalizeEntity(data.cliente),
+    productos: data.productos ?? null,
+    destino: data.destino ?? null,
+    cuerpoTexto: firstDefined(data.cuerpoTexto, data.cuerpo_texto, data.snippet, ""),
+  };
 }
 
-export function listarCorreos(carpeta = "INBOX", limite = 20) {
-  return http().get("", { params: { carpeta, limite } }).then((response) => response.data);
+function mapList(data) {
+  return (Array.isArray(data) ? data : []).map(mapCorreo);
 }
 
 export function listarHistorial() {
-  return http().get("/historial").then((response) => response.data);
+  return apiGet("/correos/historial").then(mapList);
 }
 
-export function listarCarpetas() {
-  return http().get("/carpetas").then((response) => response.data);
+export function obtenerCorreo(id) {
+  return apiGet(`/correos/${id}`).then(mapCorreo);
 }
 
 export function clasificarCorreo(id) {
-  return http().post(`/${id}/clasificar`).then((response) => response.data);
+  return apiPost(`/correos/${id}/clasificar`).then(mapCorreo);
 }
 
 export function actualizarEstadoCorreo(id, estado, area) {
-  return http().patch(`/${id}`, { estado, area }).then((response) => response.data);
+  return apiPatch(`/correos/${id}`, { estado, area: area || null }).then(mapCorreo);
 }
 
 export function ejecutarIngesta() {
-  return http().post("/ingesta/ejecutar").then((response) => response.data);
+  return apiPost("/correos/ingesta/ejecutar");
 }

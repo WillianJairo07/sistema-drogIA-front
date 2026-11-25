@@ -1,14 +1,15 @@
-import { useState } from "react";
-
-
-const clients = [
-  { id: 1, name: "Rodríguez S.A.C.", document: "20123456789" },
-  { id: 2, name: "Distribuidora Salud Perú", document: "20456789123" },
-  { id: 3, name: "Farmacias del Sur", document: "20678912345" },
-];
+import { useEffect, useState } from "react";
+import { listarClientes } from "../services/clienteService";
 
 export function ClientSearch({ onSelect }) {
+  const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    listarClientes()
+      .then(setClients)
+      .catch(() => setClients([]));
+  }, []);
 
   const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(search.toLowerCase())

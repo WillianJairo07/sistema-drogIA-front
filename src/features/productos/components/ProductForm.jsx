@@ -28,6 +28,7 @@ export function ProductForm({ product, onSave, onCancel }) {
     }
 
     onSave({
+      ...product,
       id: product?.id || Date.now(),
       name: formData.name.trim(),
       healthRegistration: formData.healthRegistration.trim(),

@@ -1,36 +1,34 @@
-import { API_BASE_URL } from "../../../services/apiConfig";
+import { apiPost } from "../../../services/apiConfig";
 
-export function login(username, password) {
-  const request = new XMLHttpRequest();
-  request.open("POST", `${API_BASE_URL}/auth/login`, false);
-  request.setRequestHeader("Content-Type", "application/json");
-  request.setRequestHeader("Accept", "application/json");
+const ROLE_LABELS = {
+  ADMINISTRACION: "Administrador",
+  ADMINISTRADOR: "Administrador",
+  VENTAS: "Vendedor",
+  VENDEDOR: "Vendedor",
+  COMPRAS: "Comprador",
+  COMPRADOR: "Comprador",
+  ALMACEN: "Almacenero",
+  ALMACENERO: "Almacenero",
+};
 
-  try {
-    request.send(JSON.stringify({ username, password }));
-  } catch {
-    return null;
-  }
+export function normalizeRole(role) {
+  if (!role) return "";
+  const key = String(role).trim().toUpperCase();
+  return ROLE_LABELS[key] || ROLE_LABELS[String(role).trim()] || role;
+}
 
-  if (request.status < 200 || request.status >= 300) {
-    return null;
-  }
-
-  let response;
-  try {
-    response = JSON.parse(request.responseText);
-  } catch {
-    return null;
-  }
+/** Inicia sesión en el backend. No guarda el token: lo hace AuthContext. */
+export async function login(username, password) {
+  const response = await apiPost("/auth/login", { username, password });
 
   if (!response || !response.token) {
     return null;
   }
 
   return {
-    name: response.name,
-    username: response.username,
-    role: response.role,
+    name: response.nombre || response.name || response.username || "",
+    username: response.username || username,
+    role: normalizeRole(response.role || response.rol),
     token: response.token,
   };
 }

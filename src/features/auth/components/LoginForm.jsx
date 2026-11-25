@@ -13,18 +13,22 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const { login: saveSession } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const user = login(username, password);
+    try {
+      const user = await login(username, password);
 
-    if (!user) {
-      alert("Credenciales incorrectas");
-      return;
+      if (!user || !user.token) {
+        alert("Credenciales incorrectas");
+        return;
+      }
+
+      saveSession(user);
+      navigate("/dashboard");
+    } catch (error) {
+      alert(error?.message || "No se pudo iniciar sesión.");
     }
-
-    saveSession(user);
-    navigate("/dashboard");
   };
 
   return (

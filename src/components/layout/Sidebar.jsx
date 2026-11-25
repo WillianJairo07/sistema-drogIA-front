@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { rolePermissions } from "../../features/auth/config/permissions";
+import { hasPermission } from "../../features/auth/config/permissions";
 import {
   LayoutDashboard,
   FileText,
@@ -36,10 +36,8 @@ const menuItems = [
 export default function Sidebar({ isOpen, onClose }) {
   const { user, logout } = useAuth();
 
-  const allowedPaths = rolePermissions[user?.role] || [];
-
   const visibleItems = menuItems.filter((item) =>
-    allowedPaths.includes(item.path)
+    hasPermission(user?.role, item.path)
   );
 
   const handleLogout = () => {

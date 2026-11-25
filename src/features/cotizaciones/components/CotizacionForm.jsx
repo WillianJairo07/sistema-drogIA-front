@@ -105,6 +105,9 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
       id: initialQuote?.id ?? Date.now(),
       number: initialQuote?.number ?? `COT-${String(Date.now()).slice(-4)}`,
       status: initialQuote?.status ?? "Pendiente",
+      casoId: initialQuote?.casoId ?? null,
+      destino: initialQuote?.destino ?? null,
+      proveedores: initialQuote?.proveedores ?? [],
       client,
       date,
       products: products.map((product, index) => ({
@@ -124,10 +127,12 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
     <div className="cotizaciones-card">
       <div>
         <h3 className="cotizaciones-card-title">
-          {initialQuote ? `Editar Cotización ${initialQuote.number}` : "Nueva Cotización"}
+          {initialQuote?.number
+            ? `Editar Cotización ${initialQuote.number}`
+            : "Nueva Cotización"}
         </h3>
         <p className="cotizaciones-header-subtitle">
-          {initialQuote
+          {initialQuote?.number
             ? "Ajusta los datos, cantidades o precios antes de guardar o enviar."
             : "Registra los datos del cliente y los productos solicitados."}
         </p>
@@ -215,7 +220,7 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
           onClick={handleGenerate}
           className="cotizaciones-btn-primary"
         >
-          {initialQuote ? "Guardar Cambios" : "Generar Cotización"}
+          {initialQuote?.number ? "Guardar Cambios" : "Generar Cotización"}
         </button>
       </div>
     </div>

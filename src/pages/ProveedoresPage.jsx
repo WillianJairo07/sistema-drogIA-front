@@ -1,37 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SupplierForm } from "../features/proveedores/components/SupplierForm";
 import { SupplierList } from "../features/proveedores/components/SupplierList";
+import {
+  actualizarProveedor,
+  crearProveedor,
+  eliminarProveedor,
+  listarProveedores,
+} from "../features/proveedores/services/proveedorService";
 import "../styles/proveedores.css";
 
-const initialSuppliers = [
-  {
-    id: 1,
-    name: "Laboratorios del Sur S.A.C.",
-    document: "20123456789",
-    phone: "987654321",
-    email: "contacto@labsur.com",
-  },
-  {
-    id: 2,
-    name: "Distribuidora Médica Perú S.A.C.",
-    document: "20456789123",
-    phone: "956123456",
-    email: "ventas@distribuidoramedica.com",
-  },
-  {
-    id: 3,
-    name: "Productos Farmacéuticos Andinos",
-    document: "20678912345",
-    phone: "945789123",
-    email: "contacto@farmaandinos.com",
-  },
-];
-
 export function ProveedoresPage() {
-  const [suppliers, setSuppliers] = useState(initialSuppliers);
+  const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState(null);
+
+  useEffect(() => {
+    listarProveedores()
+      .then(setSuppliers)
+      .catch((error) => alert(error.message));
+  }, []);
 
   const filteredSuppliers = suppliers.filter((supplier) => {
     const value = search.toLowerCase();
@@ -41,21 +29,27 @@ export function ProveedoresPage() {
     );
   });
 
-  const handleSave = (supplier) => {
-    setSuppliers((currentSuppliers) => {
-      const exists = currentSuppliers.some((item) => item.id === supplier.id);
+  const handleSave = async (supplier) => {
+    try {
+      const guardado = editingSupplier
+        ? await actualizarProveedor(editingSupplier.id, supplier)
+        : await crearProveedor(supplier);
 
-      if (exists) {
-        return currentSuppliers.map((item) =>
-          item.id === supplier.id ? supplier : item
-        );
-      }
+      setSuppliers((currentSuppliers) => {
+        const exists = currentSuppliers.some((item) => item.id === guardado.id);
+        if (exists) {
+          return currentSuppliers.map((item) =>
+            item.id === guardado.id ? guardado : item
+          );
+        }
+        return [...currentSuppliers, guardado];
+      });
 
-      return [...currentSuppliers, supplier];
-    });
-
-    setShowForm(false);
-    setEditingSupplier(null);
+      setShowForm(false);
+      setEditingSupplier(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleEdit = (supplier) => {
@@ -63,10 +57,15 @@ export function ProveedoresPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (supplierId) => {
-    setSuppliers((currentSuppliers) =>
-      currentSuppliers.filter((supplier) => supplier.id !== supplierId)
-    );
+  const handleDelete = async (supplierId) => {
+    try {
+      await eliminarProveedor(supplierId);
+      setSuppliers((currentSuppliers) =>
+        currentSuppliers.filter((supplier) => supplier.id !== supplierId)
+      );
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleNewSupplier = () => {

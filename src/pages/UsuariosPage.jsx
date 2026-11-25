@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserForm } from "../features/usuarios/components/UserForm";
 import { UserList } from "../features/usuarios/components/UserList";
-import "../styles/usuarios.css"; 
-
-const initialUsers = [
-  { id: 1, name: "Carlos Mendoza", email: "carlos@drogia.com", role: "Vendedor", active: true },
-  { id: 2, name: "Ana Torres", email: "ana@drogia.com", role: "Comprador", active: true },
-  { id: 3, name: "Luis Ramos", email: "luis@drogia.com", role: "Almacenero", active: false },
-  { id: 4, name: "Administrador", email: "admin@drogia.com", role: "Administrador", active: true },
-];
+import {
+  actualizarUsuario,
+  cambiarEstadoUsuario,
+  crearUsuario,
+  listarUsuarios,
+} from "../features/usuarios/services/usuarioService";
+import "../styles/usuarios.css";
 
 export default function UsuariosPage() {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+
+  useEffect(() => {
+    listarUsuarios()
+      .then(setUsers)
+      .catch((error) => alert(error.message));
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     const value = search.toLowerCase();
@@ -25,19 +30,27 @@ export default function UsuariosPage() {
     );
   });
 
-  const handleSave = (user) => {
-    setUsers((currentUsers) => {
-      const exists = currentUsers.some((item) => item.id === user.id);
-      if (exists) {
-        return currentUsers.map((item) =>
-          item.id === user.id ? user : item
-        );
-      }
-      return [...currentUsers, user];
-    });
+  const handleSave = async (user) => {
+    try {
+      const guardado = editingUser
+        ? await actualizarUsuario(editingUser.id, user)
+        : await crearUsuario(user);
 
-    setShowForm(false);
-    setEditingUser(null);
+      setUsers((currentUsers) => {
+        const exists = currentUsers.some((item) => item.id === guardado.id);
+        if (exists) {
+          return currentUsers.map((item) =>
+            item.id === guardado.id ? guardado : item
+          );
+        }
+        return [...currentUsers, guardado];
+      });
+
+      setShowForm(false);
+      setEditingUser(null);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleEdit = (user) => {
@@ -45,12 +58,18 @@ export default function UsuariosPage() {
     setShowForm(true);
   };
 
-  const handleToggleStatus = (userId) => {
-    setUsers((currentUsers) =>
-      currentUsers.map((user) =>
-        user.id === userId ? { ...user, active: !user.active } : user
-      )
-    );
+  const handleToggleStatus = async (userId) => {
+    try {
+      const usuario = users.find((item) => item.id === userId);
+      const actualizado = await cambiarEstadoUsuario(userId, !usuario.active);
+      setUsers((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === userId ? actualizado : user
+        )
+      );
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleNewUser = () => {

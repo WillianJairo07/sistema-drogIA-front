@@ -1,37 +1,15 @@
-import { useState } from "react";
-
-const products = [
-  {
-    id: 1,
-    name: "Paracetamol 500 mg",
-    lot: "LOT-PAR-001",
-    healthRegistration: "RSA-12345",
-    price: 5.0,
-    stock: 120,
-    expiration: "2027-08-15",
-  },
-  {
-    id: 2,
-    name: "Alcohol 70%",
-    lot: "LOT-ALC-002",
-    healthRegistration: "RSA-23456",
-    price: 8.0,
-    stock: 80,
-    expiration: "2027-05-20",
-  },
-  {
-    id: 3,
-    name: "Ibuprofeno 400 mg",
-    lot: "LOT-IBU-003",
-    healthRegistration: "RSA-34567",
-    price: 7.5,
-    stock: 45,
-    expiration: "2026-12-10",
-  },
-];
+import { useEffect, useState } from "react";
+import { buscarProductos } from "../services/productoService";
 
 export function ProductSearch({ onSelect }) {
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    buscarProductos("")
+      .then(setProducts)
+      .catch(() => setProducts([]));
+  }, []);
 
   const filteredProducts = products.filter((product) => {
     const value = search.toLowerCase();
