@@ -7,7 +7,13 @@ export function mapPedido(data = {}) {
     ...data,
     id: data.id ?? null,
     number: firstDefined(data.saleNumber, data.numero, ""),
-    orderNumber: firstDefined(data.ordenCompraNumero, ""),
+    orderId: data.ordenCompraId ?? data.orderId ?? null,
+    orderNumber: firstDefined(
+      data.ordenCompraNumero,
+      data.ordenCompraId,
+      data.orderNumber,
+      ""
+    ),
     date: firstDefined(data.fechaAsignacion, data.date, ""),
     products: productos,
     product: productos.map((item) => item.name || item.producto || item.product || "").filter(Boolean).join(", "),
@@ -16,6 +22,7 @@ export function mapPedido(data = {}) {
     saleNumber: firstDefined(data.saleNumber, ""),
     client: data.client ?? null,
     destination: data.destination ?? null,
+    tipoDespacho: firstDefined(data.tipoDespacho, "LOCAL"),
     assignedTo: firstDefined(data.assignedTo, ""),
     verificadoInfo: Boolean(data.verificadoInfo),
     verificadoLotes: Boolean(data.verificadoLotes),

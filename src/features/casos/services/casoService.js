@@ -15,6 +15,7 @@ export function mapCaso(data = {}) {
     asignadoAId: data.asignadoAId ?? null,
     asignadoANombre: firstDefined(data.asignadoANombre, ""),
     codigoSolicitud: firstDefined(data.codigoSolicitud, ""),
+    fechaLimiteCotizacion: data.fechaLimiteCotizacion ?? null,
     cliente: normalizeEntity(data.cliente),
     productos: normalizeList(data.productos),
     destino: data.destino ?? null,

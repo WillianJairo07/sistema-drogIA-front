@@ -1,46 +1,101 @@
 import { useEffect, useState } from "react";
 import { CotizacionItems } from "./CotizacionItems";
-import { ProductSearch } from "../../productos/components/ProductSearch";
 import { ClientSearch } from "../../clientes/components/ClientSearch";
+import { firstDefined, normalizeList } from "../../../services/mappers";
+import {
+  claveProducto,
+  cotizacionesParaProducto,
+} from "../data/proveedoresMock";
 
 const IGV_RATE = 0.18;
+
+function calcularMargen(precioVenta, precioCompra) {
+  const venta = Number(precioVenta) || 0;
+  if (!venta) return 0;
+  const compra = Number(precioCompra) || 0;
+  return Math.round(((venta - compra) / venta) * 10000) / 100;
+}
+
+function productosInicialesDelFormulario(initialQuote) {
+  const guardados = normalizeList(initialQuote?.proveedores);
+
+  return normalizeList(initialQuote?.products).map((producto, index) => {
+    const nombre = firstDefined(
+      producto.name,
+      producto.nombre,
+      producto.producto,
+      ""
+    );
+    const guardado = guardados.find((proveedor) => {
+      const mismoId =
+        proveedor.productoId != null &&
+        producto.id != null &&
+        String(proveedor.productoId) === String(producto.id);
+      const mismoNombre =
+        proveedor.producto &&
+        claveProducto(proveedor.producto) === claveProducto(nombre);
+      return mismoId || mismoNombre;
+    });
+
+    const referencia = Number(producto.price) > 0 ? Number(producto.price) : null;
+    const resultado = cotizacionesParaProducto(nombre, referencia);
+    const opciones = resultado.opciones;
+    const precioCompra = Number(
+      firstDefined(guardado?.precioCompra, 0)
+    );
+    const seleccion =
+      opciones.find(
+        (opcion) =>
+          opcion.id === guardado?.id || opcion.name === guardado?.name
+      ) || guardado || null;
+
+    if (seleccion && !opciones.some((opcion) => opcion.id === seleccion.id)) {
+      opciones.push({ ...seleccion, precioCompra });
+    }
+
+    const precioVenta = resultado.precioVenta || Number(producto.price) || 0;
+
+    return {
+      ...producto,
+      id: producto.id ?? `TMP-${index + 1}`,
+      name: nombre,
+      price: precioVenta,
+      precioCompra,
+      margen: calcularMargen(precioVenta, precioCompra),
+      proveedor: seleccion,
+      opcionesProveedores: opciones,
+    };
+  });
+}
 
 export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
   const [client, setClient] = useState(initialQuote?.client || null);
   const [date, setDate] = useState(initialQuote?.date || "");
-  const [products, setProducts] = useState(initialQuote?.products || []);
+  const [products, setProducts] = useState(() =>
+    productosInicialesDelFormulario(initialQuote)
+  );
   const [error, setError] = useState("");
 
   useEffect(() => {
     setClient(initialQuote?.client || null);
     setDate(initialQuote?.date || "");
-    setProducts(initialQuote?.products || []);
+    setProducts(productosInicialesDelFormulario(initialQuote));
     setError("");
   }, [initialQuote]);
 
-  const addProduct = (product) => {
-    setError("");
-    setProducts((currentProducts) => {
-      const existingProduct = currentProducts.find(
-        (item) => item.id === product.id
-      );
-      if (existingProduct) {
-        return currentProducts.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [
-        ...currentProducts,
-        {
-          ...product,
-          unit: product.unit || product.unidadMedida || "UNIDAD",
-          quantity: 1,
-          price: Number(product.price) || 0,
-        },
-      ];
-    });
+  const seleccionarProveedor = (productId, opcion) => {
+    setProducts((actuales) =>
+      actuales.map((producto) =>
+        producto.id === productId
+          ? {
+              ...producto,
+              proveedor: opcion,
+              precioCompra: Number(opcion?.precioCompra) || 0,
+              margen: calcularMargen(producto.price, opcion?.precioCompra),
+            }
+          : producto
+      )
+    );
   };
 
   const increaseQuantity = (productId) => {
@@ -70,10 +125,43 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
   };
 
   const changePrice = (productId, price) => {
+    const precio = Number(price) || 0;
+    setProducts((currentProducts) =>
+      currentProducts.map((product) => {
+        if (product.id !== productId) return product;
+
+        const opciones = cotizacionesParaProducto(product.name, precio).opciones;
+        const seleccion = opciones.find(
+          (opcion) => opcion.id === product.proveedor?.id
+        );
+        const precioCompra = seleccion
+          ? Number(seleccion.precioCompra) || 0
+          : product.precioCompra;
+
+        return {
+          ...product,
+          price: precio,
+          opcionesProveedores: opciones.length
+            ? opciones
+            : product.opcionesProveedores,
+          proveedor: seleccion || product.proveedor,
+          precioCompra,
+          margen: calcularMargen(precio, precioCompra),
+        };
+      })
+    );
+  };
+
+  const changePrecioCompra = (productId, precioCompra) => {
+    const compra = Number(precioCompra) || 0;
     setProducts((currentProducts) =>
       currentProducts.map((product) =>
         product.id === productId
-          ? { ...product, price: Number(price) || 0 }
+          ? {
+              ...product,
+              precioCompra: compra,
+              margen: calcularMargen(product.price, compra),
+            }
           : product
       )
     );
@@ -86,6 +174,14 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
   );
   const igv = subtotal * IGV_RATE;
   const total = subtotal + igv;
+  const totalCompra = products.reduce(
+    (sum, product) =>
+      sum + (Number(product.quantity) || 0) * (Number(product.precioCompra) || 0),
+    0
+  );
+  const margenGlobal = subtotal
+    ? Math.round(((subtotal - totalCompra) / subtotal) * 10000) / 100
+    : 0;
 
   const handleGenerate = () => {
     if (!client) {
@@ -97,9 +193,25 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
       return;
     }
     if (products.length === 0) {
-      setError("Agrega al menos un producto para continuar.");
+      setError("No hay productos solicitados para continuar.");
       return;
     }
+
+    const proveedores = products
+      .filter((product) => product.proveedor)
+      .map((product) => ({
+        id: product.proveedor.id,
+        name: product.proveedor.name,
+        document: product.proveedor.document,
+        tipo: product.proveedor.tipo,
+        plazoDias: product.proveedor.plazoDias,
+        productoId: product.productId ?? product.id ?? null,
+        producto: product.name,
+        precioCompra: Number(product.precioCompra) || 0,
+        precioVenta: Number(product.price) || 0,
+        margen: Number(product.margen) || 0,
+        seleccionado: true,
+      }));
 
     const quote = {
       id: initialQuote?.id ?? Date.now(),
@@ -107,14 +219,26 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
       status: initialQuote?.status ?? "Pendiente",
       casoId: initialQuote?.casoId ?? null,
       destino: initialQuote?.destino ?? null,
-      proveedores: initialQuote?.proveedores ?? [],
+      proveedores,
       client,
       date,
-      products: products.map((product, index) => ({
-        ...product,
-        item: index + 1,
-        unit: product.unit || product.unidadMedida || "UNIDAD",
-      })),
+      products: products.map(
+        (
+          {
+            proveedores: _proveedores,
+            proveedor: _proveedor,
+            opcionesProveedores: _opciones,
+            precioCompra: _precioCompra,
+            margen: _margen,
+            ...product
+          },
+          index
+        ) => ({
+          ...product,
+          item: index + 1,
+          unit: product.unit || product.unidadMedida || "UNIDAD",
+        })
+      ),
       subtotal,
       igv,
       total,
@@ -141,7 +265,10 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
       <div className="cotizaciones-form-grid">
         <div>
           <label className="cotizaciones-label">Cliente</label>
-          <ClientSearch onSelect={setClient} />
+          <ClientSearch
+            onSelect={setClient}
+            initialValue={client?.name || ""}
+          />
           {client && (
             <p style={{ marginTop: "8px", fontSize: "14px", color: "#475569" }}>
               Cliente seleccionado: {client.name}
@@ -151,7 +278,7 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
         </div>
 
         <div>
-          <label className="cotizaciones-label">Fecha</label>
+          <label className="cotizaciones-label">Fecha de la solicitud</label>
           <input
             type="date"
             value={date}
@@ -167,11 +294,10 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
             Productos
           </h4>
           <p className="cotizaciones-header-subtitle">
-            Busca y agrega los productos solicitados por el cliente.
+            Productos solicitados por el cliente. Para cada uno se muestran solo las tres
+            cotizaciones de proveedor disponibles, con existencia ilimitada.
           </p>
         </div>
-
-        <ProductSearch onSelect={addProduct} />
 
         <CotizacionItems
           products={products}
@@ -179,6 +305,8 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
           onDecrease={decreaseQuantity}
           onRemove={removeProduct}
           onPriceChange={changePrice}
+          onPrecioCompraChange={changePrecioCompra}
+          onProveedorChange={seleccionarProveedor}
         />
       </div>
 
@@ -200,6 +328,14 @@ export function CotizacionForm({ initialQuote = null, onCancel, onGenerate }) {
             <span style={{ fontSize: "14px", fontWeight: 600, color: "#17324c" }}>Total</span>
             <span style={{ fontSize: "18px", fontWeight: 700, color: "#17324c" }}>
               S/ {total.toFixed(2)}
+            </span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: "8px" }}>
+            <span style={{ fontSize: "13px", color: "#475569" }}>Margen estimado</span>
+            <span
+              className={margenGlobal >= 0 ? "cotizaciones-margen-positivo" : "cotizaciones-margen-negativo"}
+            >
+              {margenGlobal.toFixed(2)}%
             </span>
           </div>
         </div>

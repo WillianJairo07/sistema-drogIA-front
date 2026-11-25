@@ -135,24 +135,95 @@
 
 .cotizaciones-table {
   width: 100%;
-  min-width: 800px;
+  min-width: 1120px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .cotizaciones-table th {
   background-color: #f8fafc;
   color: #475569;
   font-weight: 500;
-  padding: 12px 24px;
+  padding: 12px 14px;
   border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
 }
 
 .cotizaciones-table td {
-  padding: 16px 24px;
+  padding: 14px;
   border-top: 1px solid #e2e8f0;
   color: #334155;
+  vertical-align: top;
+}
+
+/* Proveedores seleccionados dentro de la tabla de productos */
+.cotizaciones-proveedor-celda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.cotizaciones-proveedor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cotizaciones-proveedor-chip button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+.cotizaciones-proveedor-input {
+  width: 160px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.cotizaciones-proveedor-select {
+  min-width: 260px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.cotizaciones-proveedor-detalle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.cotizaciones-input-precio {
+  width: 110px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.cotizaciones-margen-positivo {
+  color: #047857;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cotizaciones-margen-negativo {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* Etiquetas de Estado */

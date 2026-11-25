@@ -20,7 +20,12 @@ import {
   crearInventario,
   actualizarInventario,
 } from "../features/inventario/services/inventarioService";
-import { listarDespachos, crearDespacho } from "../features/despachos/services/despachoService";
+import { listarInventarioAlmacen } from "../features/inventario/services/inventarioAlmacenService";
+import {
+  listarDespachos,
+  crearDespacho,
+  cambiarEstadoDespacho,
+} from "../features/despachos/services/despachoService";
 import {
   listarPedidos,
   marcarPedidoTomado,
@@ -36,6 +41,7 @@ export default function DashboardLayout() {
   const [purchaseRequests, setPurchaseRequests] = useState([]);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [inventarioAlmacen, setInventarioAlmacen] = useState([]);
   const [dispatches, setDispatches] = useState([]);
   const [pedidos, setPedidos] = useState([]);
 
@@ -45,6 +51,9 @@ export default function DashboardLayout() {
       listarSolicitudes().then(setPurchaseRequests).catch(() => setPurchaseRequests([])),
       listarOrdenes().then(setPurchaseOrders).catch(() => setPurchaseOrders([])),
       listarInventario().then(setInventory).catch(() => setInventory([])),
+      listarInventarioAlmacen()
+        .then(setInventarioAlmacen)
+        .catch(() => setInventarioAlmacen([])),
       listarDespachos().then(setDispatches).catch(() => setDispatches([])),
       listarPedidos().then(setPedidos).catch(() => setPedidos([])),
     ]);
@@ -151,6 +160,15 @@ export default function DashboardLayout() {
     }
   };
 
+  const handleCambiarEstadoDespacho = async (despachoId, estado) => {
+    try {
+      await cambiarEstadoDespacho(despachoId, estado);
+      await recargar();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   const handleTomarPedido = async (pedidoId) => {
     try {
       await marcarPedidoTomado(pedidoId);
@@ -220,11 +238,13 @@ export default function DashboardLayout() {
                   handleRegisterPurchaseReceipt,
 
                 inventory,
+                inventarioAlmacen,
                 onAddInventoryItem: handleAddInventoryItem,
                 onUpdateInventoryItem: handleUpdateInventoryItem,
 
                 dispatches,
                 onCreateDispatch: handleCreateDispatch,
+                onDespachoStatusChange: handleCambiarEstadoDespacho,
 
                 pedidos,
                 onTomarPedido: handleTomarPedido,

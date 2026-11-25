@@ -209,7 +209,7 @@
 
 .inventario-table {
   width: 100%;
-  min-width: 700px;
+  min-width: 1050px;
   border-collapse: collapse;
   text-align: left;
   font-size: 14px;
@@ -252,4 +252,19 @@
 .badge-disponible {
   background-color: #dcfce7;
   color: #15803d;
+}
+
+.badge-inventario-despachar {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.badge-inventario-prioridad {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-inventario-retrasado {
+  background-color: #ffedd5;
+  color: #c2410c;
 }

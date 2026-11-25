@@ -27,7 +27,8 @@ export function PurchaseOrderList({
         </h3>
 
         <p className="ordenes-header-subtitle">
-          Consulta y controla las órdenes realizadas a los proveedores.
+          Consulta y controla las órdenes realizadas a los proveedores. El estado
+          Cerrado se genera al registrar la recepción y habilita el pedido en Almacén.
         </p>
       </div>
 
@@ -105,15 +106,25 @@ export function PurchaseOrderList({
                         <option value="Pendiente">Pendiente</option>
                         <option value="En compra">En compra</option>
                         <option value="En tránsito">En tránsito</option>
-                        <option value="Recibido">Recibido</option>
-                        <option value="Cerrado">Cerrado</option>
+                        <option value="Recibido" disabled>
+                          Recibido
+                        </option>
+                        <option value="Cerrado" disabled>
+                          Cerrado
+                        </option>
                       </select>
                     </td>
 
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      {(order.status === "Recibido" ||
-                        order.status === "Cerrado") &&
-                      !order.receiptRegistered ? (
+                      {order.receiptRegistered ? (
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: "#059669" }}>
+                          Cerrada — pedido en Almacén
+                        </span>
+                      ) : order.status === "Recibido" ? (
+                        <span style={{ fontSize: "12px", color: "#b45309" }}>
+                          Devuelva a En tránsito para registrar la recepción
+                        </span>
+                      ) : (
                         <button
                           type="button"
                           onClick={() =>
@@ -122,16 +133,8 @@ export function PurchaseOrderList({
                           className="ordenes-btn-primary"
                           style={{ padding: "6px 12px", fontSize: "12px" }}
                         >
-                          Registrar recepción
+                          Registrar recepción y cerrar
                         </button>
-                      ) : order.receiptRegistered ? (
-                        <span style={{ fontSize: "12px", fontWeight: 500, color: "#059669" }}>
-                          Recepción registrada
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-                          —
-                        </span>
                       )}
                     </td>
                   </tr>

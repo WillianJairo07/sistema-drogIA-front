@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "../../../services/apiConfig";
+import { apiGet, apiPatch, apiPost } from "../../../services/apiConfig";
 import { firstDefined, toIsoDate, toNumber } from "../../../services/mappers";
 
 export function mapDespacho(data = {}) {
@@ -12,7 +12,11 @@ export function mapDespacho(data = {}) {
     product: firstDefined(data.product, data.producto, ""),
     quantity: toNumber(firstDefined(data.quantity, data.cantidad), 0),
     date: toIsoDate(firstDefined(data.date, data.fecha)) || "",
+    tipoDespacho: firstDefined(data.tipoDespacho, "LOCAL"),
     courier: firstDefined(data.courierEmpresa, data.courier, ""),
+    courierServicio: firstDefined(data.courierServicio, ""),
+    numeroGuia: firstDefined(data.numeroGuia, ""),
+    costoEnvio: toNumber(data.costoEnvio, 0),
     thirdPartyName: firstDefined(data.thirdPartyName, data.courierEmpresa, ""),
     thirdPartyDoc: firstDefined(data.thirdPartyDoc, ""),
     status: firstDefined(data.status, data.estado, "Programado"),
@@ -28,9 +32,14 @@ function toRequest(record = {}) {
     purchaseOrderCode: record.purchaseOrderCode || null,
     quantity: toNumber(record.quantity, 0),
     date: toIsoDate(record.date),
-    courierEmpresa: record.thirdPartyName || null,
+    courierEmpresa:
+      record.courierEmpresa ||
+      (record.tipoDespacho === "COURIER" ? record.thirdPartyName : null),
     courierServicio: record.courierServicio || null,
-    numeroGuia: record.code || record.numeroGuia || null,
+    numeroGuia:
+      record.numeroGuia ||
+      (record.tipoDespacho === "COURIER" ? record.code : null) ||
+      null,
     costoEnvio: record.costoEnvio ?? null,
   };
 }
@@ -43,4 +52,8 @@ export function listarDespachos() {
 
 export function crearDespacho(record) {
   return apiPost("/despachos", toRequest(record)).then(mapDespacho);
+}
+
+export function cambiarEstadoDespacho(id, estado) {
+  return apiPatch(`/despachos/${id}/estado`, { estado }).then(mapDespacho);
 }

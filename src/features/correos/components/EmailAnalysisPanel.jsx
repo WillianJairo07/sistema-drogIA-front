@@ -9,12 +9,17 @@ import {
   listarHistorial,
   obtenerCorreo,
 } from "../services/correoService";
+import { listarCasos, tomarCaso } from "../../casos/services/casoService";
+import { extraerDatosCorreo } from "../utils/extraerDatosCorreo";
 
 export function EmailAnalysisPanel() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const puedeCotizar = normalizeRole(user?.role) === "Vendedor";
+  const rol = normalizeRole(user?.role);
+  const puedeCotizar = rol === "Vendedor";
+  const puedeValidarOrden = rol === "Administrador" || rol === "Vendedor";
   const [emails, setEmails] = useState([]);
+  const [casos, setCasos] = useState([]);
   const [carpeta, setCarpeta] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const [procesandoId, setProcesandoId] = useState(null);
@@ -26,7 +31,12 @@ export function EmailAnalysisPanel() {
     setLoading(true);
     setError("");
     try {
-      setEmails(await listarHistorial());
+      const [historial, casosDisponibles] = await Promise.all([
+        listarHistorial(),
+        listarCasos().catch(() => []),
+      ]);
+      setEmails(historial);
+      setCasos(casosDisponibles);
     } catch {
       setError("No se pudo cargar el historial de correos.");
     } finally {
@@ -38,11 +48,90 @@ export function EmailAnalysisPanel() {
     cargarHistorial();
   }, []);
 
+  const formatearFecha = (valor) => {
+    if (!valor) return "-";
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? String(valor) : fecha.toLocaleString();
+  };
+
+  const nombreUsuarioActual = String(
+    user?.name || user?.username || ""
+  )
+    .trim()
+    .toLowerCase();
+  const idUsuarioActual = user?.id ?? user?.userId ?? null;
+
+  const casoDelCorreo = (email, lista = casos) =>
+    lista.find(
+      (caso) =>
+        (email?.caseId != null && String(caso.id) === String(email.caseId)) ||
+        (email?.id != null &&
+          caso.correoId != null &&
+          String(caso.correoId) === String(email.id))
+    ) || null;
+
+  const casoEstaAsignado = (caso) =>
+    Boolean(caso?.asignadoAId || caso?.asignadoANombre);
+
+  const casoEsDelUsuario = (caso) => {
+    if (!casoEstaAsignado(caso)) return false;
+    if (idUsuarioActual != null && caso.asignadoAId != null) {
+      return String(idUsuarioActual) === String(caso.asignadoAId);
+    }
+    if (caso.asignadoANombre) {
+      return (
+        String(caso.asignadoANombre).trim().toLowerCase() ===
+        nombreUsuarioActual
+      );
+    }
+    return false;
+  };
+
+  const estadoSolicitud = (email, caso = casoDelCorreo(email)) => {
+    if (casoEstaAsignado(caso)) {
+      if (casoEsDelUsuario(caso)) {
+        return {
+          texto: "En cotización",
+          clase: "badge-correo-asignado",
+          boton: "Continuar cotización",
+          deshabilitado: false,
+        };
+      }
+      const nombre = caso.asignadoANombre || "otro usuario";
+      return {
+        texto: `Tomado por ${nombre}`,
+        clase: "badge-correo-tomado",
+        boton: `Tomado por ${nombre}`,
+        deshabilitado: true,
+      };
+    }
+
+    if (email?.status === "Analizado" && email?.area === "Ventas") {
+      return {
+        texto: "Pendiente de tomar",
+        clase: "badge-correo-pendiente",
+        boton: "Cotizar",
+        deshabilitado: false,
+      };
+    }
+
+    return null;
+  };
+
   const areas = [...new Set(emails.map((email) => email.area).filter(Boolean))];
   const correosVisibles =
     carpeta === "Todos"
       ? emails
       : emails.filter((email) => email.area === carpeta);
+
+  const casoSeleccionado = casoDelCorreo(correoSeleccionado);
+  const solicitudSeleccionada = estadoSolicitud(
+    correoSeleccionado,
+    casoSeleccionado
+  );
+  const datosCorreoSeleccionado = correoSeleccionado
+    ? extraerDatosCorreo(correoSeleccionado, casoSeleccionado)
+    : null;
 
   const handleAnalyze = async (id) => {
     setProcesandoId(id);
@@ -52,6 +141,9 @@ export function EmailAnalysisPanel() {
       setEmails((currentEmails) =>
         currentEmails.map((email) => (email.id === id ? actualizado : email))
       );
+      if (correoSeleccionado?.id === id) {
+        setCorreoSeleccionado(actualizado);
+      }
     } catch {
       setError("No se pudo clasificar el correo.");
     } finally {
@@ -114,10 +206,55 @@ export function EmailAnalysisPanel() {
     }
   };
 
-  const handleCotizar = (email) => {
+  const handleCotizar = async (email) => {
+    setCorreoSeleccionado(null);
+    setProcesandoId(email.id);
+    setError("");
+    try {
+      const casosActuales = await listarCasos();
+      setCasos(casosActuales);
+      const caso = casoDelCorreo(email, casosActuales);
+      if (!caso) {
+        throw new Error("No hay un caso asociado a este correo. Analízalo primero.");
+      }
+
+      const tomado = await tomarCaso(caso.id);
+      setCasos((actuales) =>
+        actuales.some((item) => item.id === tomado.id)
+          ? actuales.map((item) => (item.id === tomado.id ? tomado : item))
+          : [tomado, ...actuales]
+      );
+      setEmails((actuales) =>
+        actuales.map((item) =>
+          item.id === email.id ? { ...item, caseId: tomado.id } : item
+        )
+      );
+
+      navigate("/dashboard/cotizaciones", {
+        state: {
+          casoId: tomado.id,
+          codigoSolicitud: tomado.codigoSolicitud,
+          fechaLimiteCotizacion: tomado.fechaLimiteCotizacion,
+          correo: { ...email, caseId: tomado.id },
+        },
+      });
+    } catch (error) {
+      await cargarHistorial();
+      setError(error.message || "No se pudo tomar el caso para cotizar.");
+    } finally {
+      setProcesandoId(null);
+    }
+  };
+
+  const handleValidarOrden = (email) => {
     setCorreoSeleccionado(null);
     navigate("/dashboard/cotizaciones", {
-      state: { casoId: email.caseId ?? null, correo: email },
+      state: {
+        ordenCorreoId: email.id,
+        codigoCotizacion:
+          email.codigoCotizacionDetectado || email.codigoReferencia || null,
+        correo: email,
+      },
     });
   };
 
@@ -196,7 +333,16 @@ export function EmailAnalysisPanel() {
 
           <tbody>
             {correosVisibles.length > 0 ? (
-              correosVisibles.map((email) => (
+              correosVisibles.map((email) => {
+                const caso = casoDelCorreo(email);
+                const solicitud = estadoSolicitud(email, caso);
+                const metaSolicitud = caso?.codigoSolicitud
+                  ? `${caso.codigoSolicitud} · límite ${formatearFecha(
+                      caso.fechaLimiteCotizacion
+                    )}`
+                  : "";
+
+                return (
                 <tr key={email.id}>
                   <td>
                     <div className="correos-truncate-sender" title={email.sender}>
@@ -208,6 +354,14 @@ export function EmailAnalysisPanel() {
                     <div className="correos-truncate-subject" title={email.subject}>
                       {email.subject}
                     </div>
+                    {metaSolicitud && (
+                      <div
+                        className="correos-solicitud-meta"
+                        title={metaSolicitud}
+                      >
+                        {metaSolicitud}
+                      </div>
+                    )}
                   </td>
 
                   <td style={{ color: "#64748b" }} className="hidden md:table-cell">
@@ -221,77 +375,102 @@ export function EmailAnalysisPanel() {
                   <td>
                     <span
                       className={`badge-correo ${
-                        email.status === "Pendiente"
+                        solicitud?.clase ||
+                        (email.status === "Pendiente"
                           ? "badge-correo-pendiente"
                           : email.status === "Analizado"
                           ? "badge-correo-analizado"
-                          : "badge-correo-revision"
+                          : "badge-correo-revision")
                       }`}
                     >
-                      {email.status}
+                      {solicitud?.texto || email.status}
                     </span>
                   </td>
 
                   <td style={{ textAlign: "right" }}>
-                    {email.status === "Pendiente" && (
-                      <button
-                        type="button"
-                        onClick={() => handleAnalyze(email.id)}
-                        disabled={procesandoId === email.id}
-                        className="correos-btn-primary"
-                      >
-                        {procesandoId === email.id ? "Analizando..." : "Analizar"}
-                      </button>
-                    )}
-
-                    {email.status === "Analizado" && puedeCotizar && (
-                      <button
-                        type="button"
-                        onClick={() => handleCotizar(email)}
-                        className="correos-btn-primary"
-                      >
-                        Cotizar
-                      </button>
-                    )}
-
-                    {email.status === "Revisión manual" && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        flexWrap: "wrap",
+                        gap: "6px",
+                      }}
+                    >
                       <button
                         type="button"
                         onClick={() => handleVerDetalle(email)}
-                        style={{
-                          padding: "6px 10px",
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
-                          background: "#ffffff",
-                          color: "#17324c",
-                          cursor: "pointer",
-                        }}
+                        className="correos-btn-secondary"
                       >
-                        Ver detalle
+                        Ver contenido
                       </button>
-                    )}
 
-                    {email.status !== "Revisión manual" && (
-                      <button
-                        type="button"
-                        onClick={() => handleMarcarRevision(email)}
-                        disabled={procesandoId === email.id}
-                        style={{
-                          marginLeft: "8px",
-                          padding: "6px 10px",
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
-                          background: "#ffffff",
-                          color: "#475569",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Marcar revisión
-                      </button>
-                    )}
+                      {email.status === "Pendiente" && (
+                        <button
+                          type="button"
+                          onClick={() => handleAnalyze(email.id)}
+                          disabled={procesandoId === email.id}
+                          className="correos-btn-primary"
+                        >
+                          {procesandoId === email.id ? "Analizando..." : "Analizar"}
+                        </button>
+                      )}
+
+                      {email.status === "Analizado" && (
+                        <button
+                          type="button"
+                          onClick={() => handleAnalyze(email.id)}
+                          disabled={procesandoId === email.id}
+                          className="correos-btn-secondary"
+                        >
+                          {procesandoId === email.id ? "Reanalizando..." : "Reanalizar"}
+                        </button>
+                      )}
+
+                      {email.status === "Analizado" &&
+                        puedeCotizar &&
+                        email.area === "Ventas" && (
+                        <button
+                          type="button"
+                          onClick={() => handleCotizar(email)}
+                          disabled={
+                            procesandoId === email.id || solicitud?.deshabilitado
+                          }
+                          className="correos-btn-primary"
+                        >
+                          {procesandoId === email.id
+                            ? "Tomando..."
+                            : solicitud?.boton || "Cotizar"}
+                        </button>
+                      )}
+
+                      {puedeValidarOrden &&
+                        (email.tipoRespuesta === "ORDEN_COMPRA" ||
+                          email.tipoClasificacion === "ORDEN_COMPRA") && (
+                          <button
+                            type="button"
+                            onClick={() => handleValidarOrden(email)}
+                            className="correos-btn-primary"
+                          >
+                            Validar orden
+                          </button>
+                        )}
+
+                      {email.status !== "Revisión manual" && (
+                        <button
+                          type="button"
+                          onClick={() => handleMarcarRevision(email)}
+                          disabled={procesandoId === email.id}
+                          className="correos-btn-secondary"
+                          style={{ color: "#475569" }}
+                        >
+                          Marcar revisión
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
-              ))
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="6" style={{ textAlign: "center", color: "#64748b", padding: "32px" }}>
@@ -321,7 +500,9 @@ export function EmailAnalysisPanel() {
             style={{
               backgroundColor: "#ffffff",
               borderRadius: "10px",
-              maxWidth: "640px",
+              maxWidth: "820px",
+              maxHeight: "90vh",
+              overflowY: "auto",
               width: "100%",
               padding: "24px",
               boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)",
@@ -330,7 +511,7 @@ export function EmailAnalysisPanel() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
               <h4 style={{ margin: 0, fontSize: "18px", fontWeight: 600, color: "#17324c" }}>
-                Detalle del correo — Revisión manual
+                Contenido completo del correo
               </h4>
               <button
                 type="button"
@@ -353,6 +534,10 @@ export function EmailAnalysisPanel() {
               <div><strong>Fecha:</strong> {correoSeleccionado.date || "-"}</div>
               <div><strong>Área:</strong> {correoSeleccionado.area || "Sin asignar"}</div>
               <div><strong>Estado:</strong> {correoSeleccionado.status}</div>
+              <div>
+                <strong>Estado de la solicitud:</strong>{" "}
+                {solicitudSeleccionada?.texto || "-"}
+              </div>
               {correoSeleccionado.codigoCotizacionDetectado && (
                 <div><strong>Código detectado:</strong> {correoSeleccionado.codigoCotizacionDetectado}</div>
               )}
@@ -366,13 +551,45 @@ export function EmailAnalysisPanel() {
               )}
             </div>
 
+            <div className="correos-modal-section">
+              <strong className="correos-modal-section-title">Cliente extraído</strong>
+              <div className="correos-modal-grid">
+                <div><strong>Nombre:</strong> {datosCorreoSeleccionado?.cliente?.name || "No detectado"}</div>
+                <div><strong>Documento:</strong> {datosCorreoSeleccionado?.cliente?.document || "No detectado"}</div>
+                <div><strong>Correo:</strong> {datosCorreoSeleccionado?.cliente?.email || "No detectado"}</div>
+              </div>
+            </div>
+
+            <div className="correos-modal-section">
+              <strong className="correos-modal-section-title">
+                Productos solicitados
+                <span className="correos-modal-origen">
+                  Origen: {datosCorreoSeleccionado?.origen || "sin datos"}
+                </span>
+              </strong>
+              {datosCorreoSeleccionado?.productos?.length ? (
+                <ul className="correos-modal-productos">
+                  {datosCorreoSeleccionado.productos.map((producto, indice) => (
+                    <li key={`${producto.name}-${indice}`}>
+                      <span>{producto.name}</span>
+                      <span className="correos-modal-cantidad">
+                        {producto.quantity ?? producto.cantidad ?? "-"} {producto.unit ?? producto.unidad ?? ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="correos-modal-vacio">No se detectaron productos en este correo.</p>
+              )}
+            </div>
+
             <div style={{ marginBottom: "20px" }}>
               <strong style={{ display: "block", fontSize: "14px", color: "#17324c", marginBottom: "6px" }}>
-                Contenido / Snippet:
+                Cuerpo completo del correo:
               </strong>
               <div
                 style={{
-                  maxHeight: "220px",
+                  maxHeight: "320px",
                   overflowY: "auto",
                   padding: "12px",
                   borderRadius: "6px",
@@ -422,15 +639,44 @@ export function EmailAnalysisPanel() {
                 Marcar como Analizado
               </button>
 
-              {puedeCotizar && (
+              <button
+                type="button"
+                onClick={() => handleAnalyze(correoSeleccionado.id)}
+                disabled={procesandoId === correoSeleccionado.id}
+                className="correos-btn-secondary"
+              >
+                {procesandoId === correoSeleccionado.id ? "Reanalizando..." : "Reanalizar"}
+              </button>
+
+              {puedeCotizar &&
+                correoSeleccionado.status === "Analizado" &&
+                correoSeleccionado.area === "Ventas" && (
                 <button
                   type="button"
                   onClick={() => handleCotizar(correoSeleccionado)}
+                  disabled={
+                    procesandoId === correoSeleccionado.id ||
+                    solicitudSeleccionada?.deshabilitado
+                  }
                   className="correos-btn-primary"
                 >
-                  Cotizar
+                  {procesandoId === correoSeleccionado.id
+                    ? "Tomando..."
+                    : solicitudSeleccionada?.boton || "Cotizar"}
                 </button>
               )}
+
+              {puedeValidarOrden &&
+                (correoSeleccionado.tipoRespuesta === "ORDEN_COMPRA" ||
+                  correoSeleccionado.tipoClasificacion === "ORDEN_COMPRA") && (
+                  <button
+                    type="button"
+                    onClick={() => handleValidarOrden(correoSeleccionado)}
+                    className="correos-btn-primary"
+                  >
+                    Validar orden
+                  </button>
+                )}
             </div>
           </div>
         </div>

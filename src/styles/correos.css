@@ -93,6 +93,17 @@
   color: #475569;
 }
 
+/* Datos de la solicitud derivada, mostrados bajo el asunto */
+.correos-solicitud-meta {
+  max-width: 260px;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #64748b;
+}
+
 /* Badges de Estado */
 .badge-correo {
   display: inline-flex;
@@ -116,6 +127,16 @@
 .badge-correo-revision {
   background-color: #fee2e2;
   color: #b91c1c;
+}
+
+.badge-correo-asignado {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-correo-tomado {
+  background-color: #e2e8f0;
+  color: #475569;
 }
 
 /* Botón de acción principal (Analizar) */
@@ -150,4 +171,86 @@
   font-size: 12px;
   color: #dc2626;
   white-space: nowrap;
+}
+
+/* Botón secundario para acciones de lectura y reanálisis */
+.correos-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #17324c;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.correos-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+/* Secciones del modal de contenido completo */
+.correos-modal-section {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f8fafc;
+}
+
+.correos-modal-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #17324c;
+}
+
+.correos-modal-origen {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.correos-modal-grid {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.correos-modal-productos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.correos-modal-productos li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.correos-modal-cantidad {
+  color: #17324c;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.correos-modal-vacio {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
 }

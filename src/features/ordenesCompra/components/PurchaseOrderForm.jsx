@@ -16,8 +16,39 @@ export function PurchaseOrderForm({
   const [error, setError] = useState("");
 
   useEffect(() => {
+    setError("");
+
     if (!request) {
       setItems([]);
+      setSupplierId("");
+      return;
+    }
+
+    setSupplierId(
+      request.supplierId != null && request.supplierId !== ""
+        ? String(request.supplierId)
+        : ""
+    );
+
+    if (Array.isArray(request.items) && request.items.length > 0) {
+      setItems(
+        request.items.map((item) => {
+          const id = item.productId ?? item.id ?? null;
+          const catalogo = products.find(
+            (producto) => String(producto.id) === String(id)
+          );
+          const quantity = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          return {
+            productId: catalogo?.id ?? id,
+            product: catalogo?.name || item.name || item.product || "",
+            unit: item.unit || catalogo?.unit || "UNIDAD",
+            quantity,
+            price,
+            subtotal: quantity * price,
+          };
+        })
+      );
       return;
     }
 
@@ -147,13 +178,16 @@ export function PurchaseOrderForm({
       id: Date.now(),
       number: `OC-${Date.now().toString().slice(-6)}`,
       supplier,
+      casoId: request?.casoId ?? null,
       date: new Date().toISOString().slice(0, 10),
       items: normalizedItems,
       subtotal,
       igv,
       total,
       status: "Pendiente",
-      requestIds: request ? [request.id] : [],
+      requestIds:
+        request?.requestIds ??
+        (request?.esCaso ? [] : request ? [request.id] : []),
       saleNumber: request?.saleNumber || null,
     });
   };
@@ -173,11 +207,16 @@ export function PurchaseOrderForm({
       {request && (
         <div className="ordenes-request-box">
           <p style={{ fontSize: "14px", fontWeight: 500, color: "#334155", margin: 0 }}>
-            Solicitud de venta (cotización aceptada)
+            {request.esVenta
+              ? "Venta confirmada por el cliente"
+              : "Solicitud de venta (cotización aceptada)"}
           </p>
 
           <p style={{ marginTop: "4px", fontSize: "14px", color: "#64748b", marginBottom: 0 }}>
-            {request.saleNumber} · {request.product} · {request.quantity} unidades
+            {request.saleNumber || `-`} · {(request.items || []).length} productos
+            {request.requestIds?.length
+              ? ` · ${request.requestIds.length} solicitudes vinculadas`
+              : ""}
           </p>
         </div>
       )}

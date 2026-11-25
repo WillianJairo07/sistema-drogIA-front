@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import { listarClientes } from "../services/clienteService";
 
-export function ClientSearch({ onSelect }) {
+export function ClientSearch({ onSelect, initialValue = "" }) {
   const [clients, setClients] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialValue || "");
+  const [abierto, setAbierto] = useState(false);
 
   useEffect(() => {
     listarClientes()
       .then(setClients)
       .catch(() => setClients([]));
   }, []);
+
+  useEffect(() => {
+    setSearch(initialValue || "");
+  }, [initialValue]);
 
   const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(search.toLowerCase())
@@ -20,13 +25,17 @@ export function ClientSearch({ onSelect }) {
       <input
         type="text"
         value={search}
-        onChange={(event) => setSearch(event.target.value)}
+        onBlur={() => setAbierto(false)}
+        onChange={(event) => {
+          setSearch(event.target.value);
+          setAbierto(true);
+        }}
         placeholder="Buscar cliente..."
         className="cotizaciones-input"
       />
 
-      {search && (
-        <div className="client-dropdown-menu">
+      {abierto && search && (
+        <div className="client-dropdown-menu" onMouseDown={(event) => event.preventDefault()}>
           {filteredClients.length > 0 ? (
             filteredClients.map((client) => (
               <button
@@ -34,7 +43,8 @@ export function ClientSearch({ onSelect }) {
                 type="button"
                 onClick={() => {
                   onSelect(client);
-                  setSearch("");
+                  setSearch(client.name);
+                  setAbierto(false);
                 }}
                 className="client-dropdown-item"
               >
