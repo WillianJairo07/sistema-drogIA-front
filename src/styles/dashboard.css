@@ -1,0 +1,394 @@
+/* ==========================================================
+   ESTILOS GENERALES DEL DASHBOARD
+   ========================================================== */
+.dashboard-screen {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #fcf6f4;
+  font-family: 'Lexend', sans-serif;
+}
+
+/* Botón flotante para contraer/expandir el menú lateral */
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 50;
+  display: flex;
+  height: 40px;
+  width: 40px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid #7dd3fc;
+  background-color: #ffffff;
+  color: #17324c;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: #f8fafc;
+}
+
+/* Contenedor principal de la derecha (Topbar + Contenido) */
+.dashboard-main-container {
+  display: flex;
+  height: 100%;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-content-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #fcf6f4;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-content-area {
+    padding: 32px;
+  }
+}
+
+.dashboard-content-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80rem;
+}
+
+/* Fondo oscuro para celulares cuando el menú lateral está abierto */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-backdrop {
+    display: none;
+  }
+}
+
+
+/* ==========================================================
+   ESTILOS DE LA BARRA LATERAL (SIDEBAR)
+   ========================================================== */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #56ccf2;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-container {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    height: 100%;
+    flex-shrink: 0;
+  }
+}
+
+.sidebar-open {
+  width: 16rem; /* 256px */
+  transform: translateX(0);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-open {
+    box-shadow: none;
+  }
+}
+
+.sidebar-closed {
+  width: 0;
+  transform: translateX(-100%);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-closed {
+    width: 0;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-inner {
+  display: flex;
+  height: 100%;
+  width: 16rem;
+  flex-direction: column;
+}
+
+/* Cabecera del Sidebar (Logo) */
+.sidebar-logo-container {
+  display: flex;
+  height: 80px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.6);
+  background-color: #7FCFEC;
+}
+
+.sidebar-logo-img {
+  width: 210px;
+  max-height: 94px;
+  transform: scale(1.5);
+  object-fit: contain;
+}
+
+/* Lista de navegación del Sidebar */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 12px;
+}
+
+.sidebar-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #17324c;
+  color: #ffffff;
+}
+
+.sidebar-link-active {
+  background-color: #17324c;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón inferior para Cerrar Sesión en el Sidebar */
+.sidebar-logout-container {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(56, 189, 248, 0.6);
+  padding: 12px;
+}
+
+.sidebar-logout-btn {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  gap: 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #b91c1c;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+
+/* ==========================================================
+   ESTILOS DE LA BARRA SUPERIOR (TOPBAR)
+   ========================================================== */
+.topbar-header {
+  display: flex;
+  height: 80px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.topbar-left-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-menu-btn {
+  cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  padding: 8px;
+  color: #08254e;
+  transition: background-color 0.2s ease;
+}
+
+.topbar-menu-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.topbar-actions-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botón de Notificaciones y Usuario en Topbar */
+.topbar-icon-btn {
+  position: relative;
+  cursor: pointer;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background-color: transparent;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.topbar-icon-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.notification-dot {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  height: 10px;
+  width: 10px;
+  border-radius: 9999px;
+  background-color: #ef4444;
+}
+
+.topbar-dropdown-menu {
+  position: absolute;
+  right: 0;
+  z-index: 50;
+  margin-top: 8px;
+  width: 288px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  padding: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.topbar-user-btn {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background-color: transparent;
+  padding: 6px 12px;
+  transition: background-color 0.2s ease;
+}
+
+.topbar-user-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.user-avatar {
+  display: flex;
+  height: 32px;
+  width: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #17324c;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  right: 0;
+  z-index: 50;
+  margin-top: 8px;
+  width: 192px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.user-dropdown-email {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.user-dropdown-logout {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background-color: transparent;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #dc2626;
+  transition: background-color 0.2s ease;
+}
+
+.user-dropdown-logout:hover {
+  background-color: #fef2f2;
+}
+
+
+/* ==========================================================
+   ESTILOS DE LA TARJETA DE BIENVENIDA DEL DASHBOARD
+   ========================================================== */
+.dashboard-card-welcome {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+}
+
+.dashboard-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.dashboard-card-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 0;
+}

@@ -1,0 +1,197 @@
+/* ESTILOS DE LOGIN */
+
+/* ==========================================================
+   1. CONTENEDOR GENERAL DE LA PANTALLA
+   ========================================================== */
+.login-screen {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #38bdf8, #bae6fd, #fee0e0);
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: 'Lexend', sans-serif;
+}
+
+/* ==========================================================
+   2. TARJETA PRINCIPAL (CAJA BLANCA/BEIGE CENTRAL)
+   ========================================================== */
+.login-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 460px;
+  min-height: 580px;
+  background-color: #fcf6f4;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* Diseño horizontal en pantallas grandes (Laptops/PCs) */
+@media (min-width: 1024px) {
+  .login-card {
+    flex-direction: row;
+    max-width: 1150px;
+    height: 580px;
+  }
+}
+
+/* ==========================================================
+   3. PANEL IZQUIERDO (CONTENEDOR DEL FORMULARIO Y LOGO)
+   ========================================================== */
+.login-left-panel {
+  width: 100%;
+  background-color: #fcf6f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* Centra horizontalmente los elementos hijos */
+  justify-content: flex-start;
+  padding: 24px;
+  margin-top: 20px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .login-left-panel {
+    flex: 1;
+    padding: 32px;
+  }
+}
+
+/* Cabecera del panel izquierdo (Alineación central absoluta) */
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* Centra el contenido flex horizontalmente */
+  text-align: center;      /* Centra los textos internos */
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Logo superior izquierdo */
+.login-logo {
+  width: 240px;            /* Tamaño ajustado para que luzca estético arriba */
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+  display: block;          /* Vital para que funcionen los márgenes automáticos */
+  margin-left: auto;       /* Margen automático izquierdo */
+  margin-right: auto;      /* Margen automático derecho */
+  object-fit: contain;
+}
+
+@media (min-width: 1024px) {
+  .login-logo {
+    width: 260px;
+  }
+}
+
+/* Subtítulo debajo del logo */
+.login-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ==========================================================
+   4. PANEL DERECHO ILUSTRACIÓN / LOGO GRANDE
+   ========================================================== */
+.login-right-panel {
+  display: none;           /* Se oculta en celulares */
+  flex: 1;
+  background-color: #56ccf2;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+}
+
+@media (min-width: 1024px) {
+  .login-right-panel {
+    display: flex;         /* Visible solo en pantallas grandes */
+  }
+}
+
+.login-logo-large {
+  width: 520px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.15));
+}
+
+@media (min-width: 1024px) {
+  .login-logo-large {
+    width: 580px;
+  }
+}
+
+/* ==========================================================
+   5. FORMULARIO E INPUTS
+   ========================================================== */
+.login-form {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #64748b;
+  width: 18px;
+  height: 18px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  color: #0f172a;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.login-input:focus {
+  border-color: #6382d7;
+}
+
+/* ==========================================================
+   6. BOTONES Y SEPARADORES
+   ========================================================== */
+.btn-submit {
+  margin-top: 30px;
+  padding: 14px;
+  background-color: #17324c;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit:hover {
+  background-color: #0f2235;
+}
+
+
+
+

@@ -1,0 +1,153 @@
+/* ==========================================================
+   ESTILOS DE ANÁLISIS DE CORREOS
+   ========================================================== */
+
+/* Contenedor principal de la vista */
+.correos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.correos-header-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.correos-header-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #17324c;
+  margin: 0;
+}
+
+.correos-header-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Contenedor tipo tarjeta general */
+.correos-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.correos-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 24px;
+}
+
+/* Tablas del módulo */
+.correos-table-wrapper {
+  overflow-x: auto;
+}
+
+.correos-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.correos-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 500;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.correos-table td {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.correos-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Clases utilitarias de texto truncado para columnas largas */
+.correos-truncate-sender {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: #334155;
+}
+
+.correos-truncate-subject {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #475569;
+}
+
+/* Badges de Estado */
+.badge-correo {
+  display: inline-flex;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-correo-pendiente {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-correo-analizado {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.badge-correo-revision {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Botón de acción principal (Analizar) */
+.correos-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #17324c;
+  color: #ffffff;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.correos-btn-primary:hover {
+  background-color: #234968;
+}
+
+/* Textos informativos de estado en la columna de acción */
+.correos-text-procesado {
+  font-size: 12px;
+  color: #059669;
+  white-space: nowrap;
+}
+
+.correos-text-requiere-revision {
+  font-size: 12px;
+  color: #dc2626;
+  white-space: nowrap;
+}

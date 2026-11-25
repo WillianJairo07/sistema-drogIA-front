@@ -1,0 +1,190 @@
+/* ==========================================================
+   ESTILOS DE PROVEEDORES
+   ========================================================== */
+
+/* Contenedor principal de la vista */
+.proveedores-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.proveedores-header-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .proveedores-header-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.proveedores-header-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #17324c;
+  margin: 0;
+}
+
+.proveedores-header-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Tarjetas y contenedores generales */
+.proveedores-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  padding: 24px;
+}
+
+/* Botones principales y secundarios */
+.proveedores-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #17324c;
+  color: #ffffff;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.proveedores-btn-primary:hover {
+  background-color: #234968;
+}
+
+.proveedores-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: transparent;
+  color: #334155;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.proveedores-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+/* Formularios e Inputs */
+.proveedores-form-grid {
+  display: grid;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+@media (min-width: 768px) {
+  .proveedores-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.proveedores-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.proveedores-input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.proveedores-input:focus {
+  border-color: #17324c;
+}
+
+.proveedores-error-text {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #dc2626;
+  margin-bottom: 0;
+}
+
+/* Tablas del módulo */
+.proveedores-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.proveedores-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.proveedores-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.proveedores-table td {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.proveedores-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Botones de acción con iconos en la tabla */
+.proveedores-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  color: #64748b;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.proveedores-action-btn:hover {
+  background-color: #f1f5f9;
+  color: #17324c;
+}
+
+.proveedores-action-btn-danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}

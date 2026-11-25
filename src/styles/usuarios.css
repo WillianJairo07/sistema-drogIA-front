@@ -1,0 +1,204 @@
+/* ==========================================================
+   ESTILOS DE USUARIOS
+   ========================================================== */
+
+.usuarios-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.usuarios-header-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .usuarios-header-wrapper {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.usuarios-header-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #17324c;
+  margin: 0;
+}
+
+.usuarios-header-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Contenedor tipo tarjeta */
+.usuarios-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.usuarios-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #17324c;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Botones principales y secundarios */
+.usuarios-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #17324c;
+  color: #ffffff;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.usuarios-btn-primary:hover {
+  background-color: #234968;
+}
+
+.usuarios-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: transparent;
+  color: #334155;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.usuarios-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+/* Formularios y grillas */
+.usuarios-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .usuarios-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.usuarios-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.usuarios-input,
+.usuarios-select {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.usuarios-input:focus,
+.usuarios-select:focus {
+  border-color: #17324c;
+}
+
+/* Tablas del módulo */
+.usuarios-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.usuarios-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 500;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.usuarios-table td {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.usuarios-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Badges de Estado (Activo / Inactivo) */
+.badge-usuario {
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-activo {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.badge-inactivo {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Botones de acción en tabla */
+.usuarios-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  color: #64748b;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.usuarios-action-btn:hover {
+  background-color: #f1f5f9;
+  color: #17324c;
+}

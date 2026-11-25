@@ -1,0 +1,225 @@
+.despacho-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.despacho-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .despacho-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.despacho-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #17324c;
+  line-height: 1.25;
+}
+
+.despacho-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.despacho-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .despacho-card {
+    padding: 24px;
+  }
+}
+
+.despacho-card-title {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #17324c;
+}
+
+.despacho-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .despacho-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .despacho-form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.despacho-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.despacho-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.despacho-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: #1e293b;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.despacho-input:focus {
+  outline: none;
+  border-color: #17324c;
+  box-shadow: 0 0 0 3px rgba(23, 50, 76, 0.1);
+}
+
+.despacho-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #dc2626;
+}
+
+.despacho-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.despacho-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #17324c;
+  border: 1px solid #17324c;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.despacho-btn-primary:hover {
+  background-color: #0f2336;
+}
+
+.despacho-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.despacho-btn-secondary:hover {
+  background-color: #f8fafc;
+}
+
+.despacho-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.despacho-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.despacho-table thead {
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.despacho-table th {
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.despacho-table td {
+  padding: 12px 14px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.despacho-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.despacho-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.despacho-empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.despacho-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #dcfce7;
+  color: #166534;
+  white-space: nowrap;
+}
